@@ -76,6 +76,24 @@ date, period
 
 registry에 없는 alias, 지표명만 비슷한 후보, 값이 같은 후보는 자동으로 동일시하지 않는다. key 생성 또는 alias 연결이 불확실하면 `JOIN_KEY_UNRESOLVED`와 `needs_human_review`를 기록한다. 실행 결과에는 양쪽 원문 alias와 최종 canonical key를 모두 보존한다.
 
+### 0-2. value_role별 값 검증
+
+canonicalization 뒤에는 `value_role`에 맞는 범위·형식·단위를 검증한다. 검증은 값이 같다는 이유로 의미를 확정하는 단계가 아니다.
+
+| `value_role` | 최소 검증 |
+|---|---|
+| `count` | 정수 여부·음수 여부·단위 |
+| `proportion` | 0~1 범위·분자·분모 |
+| `percentage` | `%` 단위·0~100 범위 |
+| `ratio`·`rate` | 분자·분모·시간 단위 |
+| `p_value` | 0~1 범위·임계값 표기와 실제 값 구분 |
+| `coefficient`·`effect` | 산식·변환·보고 단위. 계수와 효과율 분리 |
+| `confidence_interval` | 하한≤상한·중심값 관계 |
+| `mean`·`median`·`sum` | 집계 대상·그룹·결측 처리 |
+| `correlation`·`agreement` | 통계량 종류·범위·단위 |
+
+검증 실패는 `VALUE_ROLE_VALIDATION_FAILED`와 구체적인 reason code를 기록한다. 범위 검증을 통과해도 기간·모집단·분모·산식의 근거가 없으면 자동 `match`를 부여하지 않는다.
+
 `CanonicalTableArtifact`의 셀은 최소 아래 필드를 가진다.
 
 ```text

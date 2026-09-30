@@ -114,6 +114,45 @@
             </div>
           </section>
 
+          <section class="panel progress-panel" aria-labelledby="progress-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">VERIFICATION JOURNEY</p>
+                <h2 id="progress-title">검증 진행 현황</h2>
+              </div>
+              <span class="status-badge pending" id="progress-status">시작 전</span>
+            </div>
+            <div class="progress-overview" aria-live="polite">
+              <div>
+                <p class="progress-kicker" id="progress-kicker">세 파일을 선택하면 단계별 검증 현황을 보여줍니다.</p>
+                <p class="progress-copy" id="progress-copy">실제 파싱·재실행 전에도 무엇을 확인하는지와 다음 단계가 명확히 보입니다.</p>
+              </div>
+              <div class="progress-meter" aria-label="검증 진행률">
+                <strong id="progress-count">0 / 7</strong>
+                <div class="progress-track"><span id="progress-bar"></span></div>
+              </div>
+            </div>
+            <ol class="verification-journey">
+              <li class="journey-stage pending" data-progress-stage="files"><span class="journey-number">01</span><div><h3>파일 확인</h3><p>보고서·데이터·코드 구성과 형식을 확인합니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="extract"><span class="journey-number">02</span><div><h3>보고서 표 추출</h3><p>표와 수치 후보, 원문 위치를 찾습니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="prepare"><span class="journey-number">03</span><div><h3>코드 실행 준비</h3><p>입력 데이터와 승인 코드 계약을 확인합니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="run"><span class="journey-number">04</span><div><h3>코드 재실행</h3><p>격리 환경에서 출력 표를 수집합니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="link"><span class="journey-number">05</span><div><h3>표 자동 연결</h3><p>보고서 표와 실행 결과 표를 대응시킵니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="compare"><span class="journey-number">06</span><div><h3>수치 대조</h3><p>의미 10기준과 허용오차를 적용합니다.</p></div><span class="stage-state pending">대기</span></li>
+              <li class="journey-stage pending" data-progress-stage="result"><span class="journey-number">07</span><div><h3>결과 정리</h3><p>5단계 판정과 확인할 항목을 정리합니다.</p></div><span class="stage-state pending">대기</span></li>
+            </ol>
+            <div class="partial-results" aria-live="polite">
+              <p class="partial-results-title">현재까지 확인된 항목</p>
+              <dl>
+                <div><dt>파일</dt><dd id="partial-files">—</dd></div>
+                <div><dt>추출 표</dt><dd id="partial-tables">—</dd></div>
+                <div><dt>실행 결과</dt><dd id="partial-runs">—</dd></div>
+                <div><dt>대조 셀</dt><dd id="partial-cells">—</dd></div>
+              </dl>
+              <p class="progress-disclaimer">데모 값입니다. 실제 Streamlit 연동 시 각 단계의 서버 작업 결과로 교체됩니다.</p>
+            </div>
+          </section>
+
           <section class="panel result-panel" aria-labelledby="result-title">
             <div class="panel-heading">
               <div>
@@ -294,6 +333,7 @@
         </aside>
       </div>
     </main>
+    <script src="progress_journey.js"></script>
     <script src="app.js"></script>
     <script src="table_reconciliation.js"></script>
     <script src="decision_workbench.js"></script>

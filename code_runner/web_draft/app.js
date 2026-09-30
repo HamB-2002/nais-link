@@ -46,6 +46,8 @@ for (const button of sampleButtons) {
 }
 
 reviewButton.addEventListener("click", async () => {
+  reviewButton.disabled = true;
+  await window.progressJourney.runProgressDemo();
   const dataCount = state.sourceMode === "catalog" ? state.catalogDataFileCount : state.data.length;
   setStage("report-data", "attention", "대기", "보고서 의미 조건은 파서 연결 후 확인");
   setStage("code-data", "ready", "준비", codeDataDetail(dataCount));
@@ -126,6 +128,7 @@ function resetReviewState() {
   reviewStatus.textContent = "점검 전";
   reviewStatus.className = "status-badge pending";
   resultSummary.textContent = "파일을 선택한 뒤 사전 점검을 시작하세요. 실제 코드 실행과 수치 판정은 수행하지 않습니다.";
+  window.progressJourney.resetProgressJourney();
   window.resetTableReconciliation();
 }
 

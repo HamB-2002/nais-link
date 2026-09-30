@@ -1,7 +1,7 @@
 # 연구보고서 수치 수집·검증 대상 판별 파이프라인
 
 > 검토 기준 브랜치: `part/numeric`  
-> 대상: `doc_parser`의 수치 후보 추출, 명백한 비검증 수치 필터, 검증 대상 판별 및 로컬 LLM adapter
+> 대상: `doc_parser`의 수치 후보 추출, 명백한 비검증 수치 필터, 검증 대상 판별, 로컬 LLM adapter 및 결과표 formatter
 
 ## 1. 목적
 
@@ -12,10 +12,10 @@
 ## 2. 전체 구조
 
 ```text
-[문서 파서]  ──────────────────────────────── 다른 담당 영역
+HWPX / DOCX / PDF
       │
       ▼
-CollectorBlock[]
+[문서 파서 → Document → CollectorBlock[]]    parser / 다른 담당 영역
       │
       ▼
 [수치 후보 추출]                         doc_parser/numeric_candidates.py
@@ -26,7 +26,7 @@ CollectorBlock[]
       ▼
 [규칙 기반 검증 대상 판별]               doc_parser/verification_classifier.py
       │
-      ├── VERIFY / IGNORE ─────────────── 최종 candidate
+      ├── VERIFY / IGNORE ─────────────── classified candidates
       │
       └── UNCERTAIN
               │
@@ -34,7 +34,15 @@ CollectorBlock[]
        [로컬 Qwen3:8b 보조 판별]          doc_parser/ollama_classifier.py
               │
               ▼
-          최종 candidate
+          classified candidates
+              │
+              ▼
+[수치 검증 결과표 formatter]                doc_parser/numeric_result_table.py
+              │
+              ▼
+구조화된 결과표 list[dict]
+      ├── status별 조회 (VERIFY / IGNORE / UNCERTAIN)
+      └── Markdown table 보조 출력
               │
               ▼
 [코드·데이터 내력 추적 및 재실행 비교]   후속 모듈 / 다른 담당 영역
@@ -67,7 +75,7 @@ CollectorBlock[]
 }
 ```
 
-문서 파서와 `Document → CollectorBlock[]` adapter는 수치 수집 담당 외의 구현 영역이다. 다만 실제 HWPX 문서의 해당 연결은 13절의 end-to-end 통합 시험으로 확인됐다. DOCX/PDF가 numeric pipeline 전체를 통과하는 실제 통합 시험은 아직 수행하지 않았다.
+문서 파서와 `Document → CollectorBlock[]` adapter는 수치 수집 담당 외의 구현 영역이다. 다만 실제 HWPX 문서의 해당 연결은 14절의 end-to-end 통합 시험으로 확인됐다. DOCX/PDF가 numeric pipeline 전체를 통과하는 실제 통합 시험은 아직 수행하지 않았다.
 
 ## 4. 수치 후보 추출
 
@@ -267,7 +275,47 @@ UNCERTAIN
 
 복합 수치에는 이 구조에 `operator`, `statistic`, `error`, `range_start`, `range_end`, `confidence_level` 등이 선택적으로 추가될 수 있다.
 
-## 12. 테스트 현황
+classifier는 위 classified candidate의 값·문맥·위치·판정 필드를 변경하지 않는다. 이후 결과표 formatter는 candidate를 복사한 뒤 출력 편의 필드만 추가하며, classifier의 판정 결과와 기존 추가 필드를 다시 계산하거나 대체하지 않는다.
+
+## 12. 수치 검증 결과표 출력
+
+`doc_parser/numeric_result_table.py`는 classified candidate를 후속 모듈과 UI가 사용하기 쉬운 구조화 결과표로 변환한다. 기준 출력은 JSON 직렬화 가능한 `list[dict]`이며, Markdown table은 사람이 확인하기 위한 보조 출력일 뿐 기준 데이터 형식이 아니다.
+
+| 공개 함수 | 역할 |
+|---|---|
+| `format_numeric_results(candidates)` | 각 candidate를 복사하고 결과표 행 및 `display_location`을 생성 |
+| `select_results_by_status(results, status)` | `VERIFY` / `IGNORE` / `UNCERTAIN` 중 지정 status의 행을 복사해 조회 |
+| `select_verify_results(results)` | VERIFY 전용 편의 조회 |
+| `to_markdown_table(results)` | 사람 검토용 Markdown 표 문자열 생성 |
+
+formatter는 `dict(candidate)` 방식으로 기존 candidate를 복사한다. 따라서 아래 기본 필드와 후보에 이미 존재하는 추가 필드를 제거하지 않는다.
+
+| 필드 | 의미 |
+|---|---|
+| `raw`, `value`, `unit` | 원문 수치, 정규화 값, 단위 |
+| `context`, `type`, `page`, `order` | 원문 문맥과 block 위치 정보 |
+| `start`, `end` | 원래 추출 문자열 내부의 위치 |
+| `row`, `column` | table cell의 내부 0-based 위치; 없는 경우 `null`로 안정화 |
+| `display_location` | 사람 검토용 위치 문자열 |
+| `exclude`, `exclude_reason` | 명백한 비검증 수치 filter 결과 |
+| `verification_status`, `verification_reason`, `verification_method` | 최종 판별 결과 및 근거 |
+
+복합 수치의 `operator`, `statistic`, `error`, `range_start`, `range_end`, `confidence_level`도 그대로 보존된다. 미래 확장 candidate의 알 수 없는 추가 필드 역시 화이트리스트 방식으로 삭제하지 않는다.
+
+`row`와 `column`의 내부 값은 계속 0-based다. `display_location`에서만 사람에게 보여주는 행·열을 1-based로 변환한다. `order`는 실제 문서의 표 번호가 아니라 block 순서이므로 표시는 `표 #23`이 아니라 `표 block #23`을 사용한다.
+
+| block 조건 | `display_location` 예 |
+|---|---|
+| page 없는 paragraph | `문단 #45` |
+| page 있는 paragraph | `p.10 · 문단 #45` |
+| page 없는 caption | `캡션 #8` |
+| 좌표 있는 table | `표 block #23 · 2행 3열` |
+| page·좌표 있는 table | `p.10 · 표 block #23 · 2행 3열` |
+| 좌표 없는 table | `표 block #23` |
+
+`to_markdown_table()`은 기본적으로 `display_location`, `raw`, `value`, `unit`, `context`, `verification_status`, `verification_method`을 표시하고 pipe 및 줄바꿈을 escape한다. 원본 structured 결과를 Markdown으로 대체하지 않는다.
+
+## 13. 테스트 현황
 
 아래 명령을 현재 `part/numeric` 브랜치에서 실행했다.
 
@@ -294,9 +342,17 @@ python3 -m unittest \
 
 Ollama adapter 테스트는 transport mock을 사용하며 외부 또는 실제 서버를 호출하지 않는다. 위 9절의 실제 qwen3:8b 결과는 별도 로컬 통합 확인이며, 현재 자동화 테스트 파일에는 실제 모델 호출을 포함하지 않는다.
 
-별도로 `.venv` 환경에서 parser 테스트 **69건**과 numeric pipeline 테스트 **40건**이 각각 통과했다. 따라서 현재 확인된 자동화 테스트는 합계 **109건**이지만, 하나의 단일 test suite에서 `109 passed`가 나온 결과는 아니다.
+별도로 `.venv` 환경에서 다음 테스트 계열이 각각 통과했다.
 
-## 13. 실제 HWPX End-to-End 통합 검증
+| 테스트 계열 | 실행 결과 | 범위 |
+|---|---:|---|
+| numeric pipeline | **40 passed** | 위 표의 수치 추출·필터·classifier·CollectorBlock·Ollama mock 테스트 |
+| parser | **69 passed** | `doc_parser/tests/` parser 단위 테스트 |
+| numeric result formatter | **8 passed** | `test_numeric_result_table.py`: 위치 표시, status 조회, 복합 필드 보존, 원본 불변성, Markdown escape |
+
+세 결과는 서로 다른 테스트 계열에서 각각 통과한 것이다. 합계 117건을 하나의 단일 test suite에서 `117 passed`로 실행한 결과는 아니다.
+
+## 14. 실제 HWPX End-to-End 통합 검증
 
 실제 문서 `data/samples/sample-10-hwpx/report.hwpx`를 아래 경로로 실행했다.
 
@@ -306,6 +362,8 @@ parse_document(path)
 → extract_numeric_candidates_from_blocks()
 → filter_obvious_non_verification_candidates()
 → classify_candidates(..., classifier=OllamaClassifier())
+→ format_numeric_results()
+→ select_verify_results()
 ```
 
 | 항목 | 실제 결과 |
@@ -314,7 +372,9 @@ parse_document(path)
 | CollectorBlock | 82개 |
 | paragraph / caption / table | 74 / 0 / 8개 |
 | `rows`가 존재하는 table | 8개 |
-| numeric candidate | 438개 |
+| classified candidate | 438개 |
+| formatter 결과표 | 438행 |
+| VERIFY 결과표 | 147행 |
 | `exclude=true` / `exclude=false` | 7 / 431개 |
 | VERIFY | 147개 |
 | IGNORE | 36개 |
@@ -324,11 +384,17 @@ parse_document(path)
 | 실제 Ollama 호출 | 352개 |
 | 최종 결과 | 통과 |
 
-HWPX의 page 값은 모두 `null`로 유지됐다. table 후보에서는 `row`, `column`, 행 전체 context가 최종 candidate까지 보존됐다. `1,488개`, `26.5%`, `97.78%`도 실제 문서에서 모두 추출됐다.
+HWPX의 page 값은 모두 `null`로 유지됐다. table 후보에서는 `row`, `column`, 행 전체 context가 formatter 결과표까지 보존됐고, `display_location`이 추가됐다. `1,488개`, `26.5%`, `97.78%`은 모두 VERIFY 결과표에서 확인됐다.
+
+| raw | status / method | context 및 내부 위치 | 대표 `display_location` |
+|---|---|---|---|
+| `1,488개` | VERIFY / `rule` | 문단 후보 | `문단 #45` |
+| `26.5%` | VERIFY / `llm` | `해외일반 \| 82 \| 26.5%`, `row=1`, `column=2` | `표 block #23 · 2행 3열` |
+| `97.78%` | VERIFY / `llm` | `전체 percent agreement (이진 셀 기준) \| 97.78%`, `row=2`, `column=1` | `표 block #47 · 3행 2열` |
 
 실행은 unhandled exception, 누락 필드, 타입 불일치 없이 완료됐다. 352회의 실제 Ollama 호출 중 3개는 adapter 응답 실패 또는 무효 응답 등의 안전 fallback으로 처리됐으며, 후보를 삭제하거나 pipeline을 중단하지 않고 `UNCERTAIN`으로 보존했다.
 
-## 14. 현재 확인된 개선 포인트
+## 15. 현재 확인된 개선 포인트
 
 실제 HWPX 통합 시험은 후보 누락을 줄이고 안전하게 후속 단계로 전달한다는 현재 목적을 충족했다. 동시에 다음은 구현 실패가 아니라, 추가 규칙 정교화 및 LLM 호출량 최적화가 가능한 영역으로 확인됐다.
 
@@ -341,7 +407,7 @@ HWPX의 page 값은 모두 `null`로 유지됐다. table 후보에서는 `row`, 
 
 현재 설계는 연구 결과 수치를 잘못 제거하는 것보다 불필요한 후보를 남기는 편을 우선한다. 따라서 위 항목은 모든 false positive를 즉시 제거하는 요구가 아니라, 재현 가치가 있는 수치를 놓치지 않는 원칙을 유지한 최적화 후보로 관리한다.
 
-## 15. 현재 완료된 범위
+## 16. 현재 완료된 범위
 
 - [x] 숫자 후보 추출
 - [x] 정수·실수·부호·쉼표 숫자 정규화
@@ -364,8 +430,18 @@ HWPX의 page 값은 모두 `null`로 유지됐다. table 후보에서는 `row`, 
 - [x] 실제 HWPX table rows → row / column / context 보존
 - [x] 실제 HWPX의 filter·rule classifier·로컬 qwen3:8b 연결
 - [x] 실제 HWPX end-to-end 통합 시험
+- [x] classified candidate → 구조화된 결과표 변환
+- [x] 전체 상태 결과 보존
+- [x] VERIFY-only 조회
+- [x] VERIFY / IGNORE / UNCERTAIN 상태별 조회
+- [x] display_location 생성
+- [x] table 위치 표시
+- [x] 복합 수치 필드 보존
+- [x] Markdown table 보조 출력
+- [x] 실제 HWPX 결과표 생성
+- [x] 실제 HWPX VERIFY 결과표 생성
 
-## 16. 아직 남은 작업 / 다른 모듈 의존성
+## 17. 아직 남은 작업 / 다른 모듈 의존성
 
 아래 항목은 현재 수치 수집·판별 모듈에 구현되어 있지 않으며, 전체 프로젝트 연결을 위한 후속 의존성이다. 미구현 자체를 현재 모듈의 실패로 해석하지 않는다.
 
@@ -380,7 +456,7 @@ HWPX의 page 값은 모두 `null`로 유지됐다. table 후보에서는 `row`, 
 | 보고서 값과 재실행 값 비교 | 후속 모듈 / 다른 담당 영역 | 미포함 |
 | 최종 검증표 생성 | 후속 모듈 / 다른 담당 영역 | 미포함 |
 
-## 17. 팀장 검토 필요 사항
+## 18. 팀장 검토 필요 사항
 
 다음은 현재 구현을 전제로 팀 차원에서 확정하거나 검토하면 좋은 사항이다.
 

@@ -62,6 +62,7 @@ Near-black canvas와 미세한 luminance stack을 사용한다. 표면은 옅은
 | `UploadSlot` | empty, populated, keyboard focus; validation error는 후속 구현 |
 | `FileRow` | hashed; pending·removable은 후속 구현 |
 | `SamplePreset` | default, selected, loading, unavailable |
+| `NumberDecisionWorkbench` | match, mismatch, not-comparable, input-required |
 | `StageCard` | pending, ready, blocked |
 | `StatusBadge` | ready, pending, attention |
 | `PrimaryButton` | default, hover, focus-visible, disabled; running은 후속 구현 |
@@ -78,6 +79,7 @@ File rows and result stages use only opacity/transform transitions. `prefers-red
 - Buttons have at least 44px touch height.
 - Result changes announce through an `aria-live` region.
 - “실험 모드” states that no code execution or report claim extraction has occurred.
+- 수치 판정은 보고서 표시 단위·반올림 자릿수·허용오차와 기간·대상·분모·산식 조건을 각각 드러낸다.
 
 ## 8. Accepted Debt
 

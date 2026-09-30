@@ -155,6 +155,42 @@
               </article>
             </div>
           </section>
+
+          <section class="panel decision-panel" aria-labelledby="decision-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">NUMBER DECISION WORKBENCH</p>
+                <h2 id="decision-title">수치 판정 근거</h2>
+              </div>
+              <span class="status-badge pending" id="decision-status">입력 대기</span>
+            </div>
+            <p class="decision-intro">
+              초기값은 42.3% ↔ 0.423 환산 예시입니다. 검토값을 입력하면 같은 단위 환산, 보고서 자릿수, 허용오차, 의미 조건 순서로 판정합니다. 실제 보고서 Claim 추출·코드 재실행을 연결하면 이 값들이 자동으로 채워집니다.
+            </p>
+            <div class="decision-form" aria-label="수치 판정 입력">
+              <label>보고서 값<input id="report-value" inputmode="decimal" type="number" value="42.3" step="any" /></label>
+              <label>재실행 값<input id="evidence-value" inputmode="decimal" type="number" value="0.423" step="any" /></label>
+              <label>보고서 단위<select id="unit"><option value="percent">%</option><option value="raw">원값</option></select></label>
+              <label>보고서 자릿수<input id="rounding-digits" min="0" max="8" type="number" value="1" /></label>
+              <label><span id="tolerance-label">표시값 허용오차 (%p)</span><input id="tolerance" inputmode="decimal" min="0" type="number" value="0" step="any" /></label>
+            </div>
+            <fieldset class="condition-list">
+              <legend>의미 조건</legend>
+              <label><input id="period-match" type="checkbox" checked />기간</label>
+              <label><input id="population-match" type="checkbox" checked />대상</label>
+              <label><input id="denominator-match" type="checkbox" checked />분모</label>
+              <label><input id="formula-match" type="checkbox" checked />산식</label>
+            </fieldset>
+            <div class="decision-result" aria-live="polite">
+              <p id="decision-summary">입력값을 확인하는 중입니다.</p>
+              <dl>
+                <div><dt>정규화 실행값</dt><dd id="normalized-value">—</dd></div>
+                <div><dt>보고서 단위 환산</dt><dd id="display-value">—</dd></div>
+                <div><dt>자릿수 반올림</dt><dd id="rounded-value">—</dd></div>
+                <div><dt>표시값 차이</dt><dd id="difference-value">—</dd></div>
+              </dl>
+            </div>
+          </section>
         </section>
 
         <aside class="audit-rail" aria-label="검증 안내">
@@ -184,5 +220,6 @@
       </div>
     </main>
     <script src="app.js"></script>
+    <script src="decision_workbench.js"></script>
   </body>
 </html>

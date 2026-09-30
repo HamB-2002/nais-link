@@ -18,3 +18,5 @@
 |---|---|---|---|
 | 행정안전부_공공데이터 활용기업 실태조사 결과 (2016~2025 HWPX) | https://www.data.go.kr/data/15038611/fileData.do | 공공저작물 : 출처표시 (제 1유형) | HWPX 수치·표·그래프 추출 및 원자료 대조 테스트 |
 | 한국지능정보사회진흥원_공공데이터 활용기업 실태조사 raw data (2016~2025) | https://www.data.go.kr/data/15120672/fileData.do | 이용허락범위 제한 없음 | 보고서 수치의 원자료 대조 테스트 |
+| Demand for “Safe Spaces”: Avoiding Harassment and Stigma 재현 패키지 | https://github.com/worldbank/rio-safe-space | CC0 1.0 Universal (`Reproducibility Package/LICENSE`) | PDF 수치 추출·Stata/R 코드 위치 탐색·비식별 원자료 재실행 테스트 |
+| Learning Poverty Working Paper 재현 패키지 | https://github.com/worldbank/LearningPoverty/tree/v1.1/05_working_paper | MIT License | PDF 수치 추출·Stata 코드 위치 탐색·CSV/XLSX 입력 재실행 테스트 |

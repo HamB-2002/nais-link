@@ -63,6 +63,7 @@ Near-black canvas와 미세한 luminance stack을 사용한다. 표면은 옅은
 | `FileRow` | hashed; pending·removable은 후속 구현 |
 | `SamplePreset` | default, selected, loading, unavailable |
 | `NumberDecisionWorkbench` | match, mismatch, not-comparable, input-required |
+| `AutoRecoveryTrail` | direct-recovered, no-alternative, derived-review, recovery-blocked |
 | `StageCard` | pending, ready, blocked |
 | `StatusBadge` | ready, pending, attention |
 | `PrimaryButton` | default, hover, focus-visible, disabled; running은 후속 구현 |
@@ -80,7 +81,9 @@ File rows and result stages use only opacity/transform transitions. `prefers-red
 - Result changes announce through an `aria-live` region.
 - “실험 모드” states that no code execution or report claim extraction has occurred.
 - 수치 판정은 보고서 표시 단위·반올림 자릿수·허용오차와 기간·대상·분모·산식 조건을 각각 드러낸다.
+- 자동 복구는 최초 후보의 불일치 이력, 탐색 근거, 대체 후보, 최종 상태를 모두 보여 준다. 상태를 색만으로 구분하지 않는다.
 
 ## 8. Accepted Debt
 
 - 로컬 카탈로그는 고정된 `data/samples/` 공개 재현 패키지의 파일 수·보고서 크기만 읽는다. 실제 CSV 스키마 검사, 보고서 Claim 추출, 승인 실행 계약 검증, Docker 재실행은 여전히 `code_runner` 실행 어댑터 작업이다.
+- 자동 복구 워크벤치는 현재 시나리오 기반 UI 프로토타입이다. 실제 Claim·Provenance 자동 연결 엔진이 반환하는 복구 이력과 아직 연결되지 않았다.

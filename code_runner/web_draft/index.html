@@ -191,6 +191,66 @@
               </dl>
             </div>
           </section>
+
+          <section class="panel recovery-panel" aria-labelledby="recovery-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">AUTO-RECOVERY TRAIL</p>
+                <h2 id="recovery-title">비교 불가 뒤 자동 재탐색</h2>
+              </div>
+              <span class="status-badge ready" id="recovery-status">자동 재판정</span>
+            </div>
+            <p class="recovery-intro">
+              최초 후보가 평균이 아닌 합계처럼 의미 조건에서 막혀도, 같은 승인 실행의 직접 출력 후보를 자동으로 다시 찾습니다. 아래는 실제 연결 엔진이 반환할 복구 이력의 시나리오 화면입니다.
+            </p>
+            <label class="recovery-scenario" for="recovery-scenario">
+              <span>자동 복구 시나리오</span>
+              <select id="recovery-scenario">
+                <option value="direct">직접 평균 출력 후보 발견</option>
+                <option value="none">대체 출력 후보 없음</option>
+                <option value="derived">합계·유효 건수로 안전 재구성</option>
+                <option value="blocked">대체 후보의 필터가 다름</option>
+              </select>
+            </label>
+            <ol class="recovery-trail" aria-label="자동 복구 단계">
+              <li class="recovery-step attention" id="recovery-initial-step">
+                <span class="recovery-index">01</span>
+                <div>
+                  <p class="recovery-kicker">INITIAL CANDIDATE</p>
+                  <h3 id="recovery-initial-title">합계 15점은 평균 Claim과 비교 불가</h3>
+                  <p id="recovery-initial-detail">집계 방식·분모·산식이 달라 최초 후보를 보류하고 이력을 남깁니다.</p>
+                </div>
+                <span class="stage-state attention" id="recovery-initial-state">비교 불가</span>
+              </li>
+              <li class="recovery-step ready" id="recovery-search-step">
+                <span class="recovery-index">02</span>
+                <div>
+                  <p class="recovery-kicker">AUTOMATIC SEARCH</p>
+                  <h3 id="recovery-search-title">직접 평균 출력 후보를 발견했습니다</h3>
+                  <p id="recovery-search-detail">`analysis/report.py:81–87`과 `/metrics/seoul_mean`에서 동일 조건의 평균 15.02점을 찾았습니다.</p>
+                </div>
+                <span class="stage-state ready" id="recovery-search-state">후보 발견</span>
+              </li>
+              <li class="recovery-step ready" id="recovery-final-step">
+                <span class="recovery-index">03</span>
+                <div>
+                  <p class="recovery-kicker">RE-COMPARISON</p>
+                  <h3 id="recovery-final-title">대체 후보로 재대조를 완료했습니다</h3>
+                  <p id="recovery-final-detail">기간·대상·분모·결측 처리까지 일치해 반올림 후 15점으로 판정했습니다.</p>
+                </div>
+                <span class="stage-state ready" id="recovery-final-state">일치</span>
+              </li>
+            </ol>
+            <div class="recovery-result" aria-live="polite">
+              <p id="recovery-summary">최초 합계 후보의 비교 불가 이력은 보존하고, 직접 평균 출력 후보를 찾아 자동 재판정했습니다.</p>
+              <dl>
+                <div><dt>최초 후보</dt><dd id="recovery-initial-value">sum(score) = 15</dd></div>
+                <div><dt>탐색 근거</dt><dd id="recovery-evidence">report.py:81–87</dd></div>
+                <div><dt>최종 후보</dt><dd id="recovery-final-value">mean(score) = 15.02</dd></div>
+                <div><dt>복구 상태</dt><dd id="recovery-outcome">직접 후보로 재판정</dd></div>
+              </dl>
+            </div>
+          </section>
         </section>
 
         <aside class="audit-rail" aria-label="검증 안내">
@@ -221,5 +281,6 @@
     </main>
     <script src="app.js"></script>
     <script src="decision_workbench.js"></script>
+    <script src="recovery_workbench.js"></script>
   </body>
 </html>

@@ -10,7 +10,7 @@
 ## 1. Design Brief
 
 - Primary user: 연구보고서와 분석 산출물을 제출 전에 확인하는 해커톤 팀원.
-- Primary task: 보고서 1개, 데이터 여러 개, 분석 코드 1개를 선택하고 어느 검증 단계가 준비됐는지 한눈에 파악한다.
+- Primary task: 공개 재현 샘플을 고르거나 보고서 1개·데이터 여러 개·분석 코드 1개를 선택하고 어느 검증 단계가 준비됐는지 한눈에 파악한다.
 - Tone: 정확하고 차분하며, 자동 검증이 아직 실행되지 않은 상태를 과장하지 않는다.
 - Persona constraints: 키보드만 사용하는 사용자, 작은 화면 사용자, 한국어 긴 파일명을 가진 사용자가 파일 선택·상태 확인을 마칠 수 있어야 한다.
 
@@ -61,6 +61,7 @@ Near-black canvas와 미세한 luminance stack을 사용한다. 표면은 옅은
 |---|---|
 | `UploadSlot` | empty, populated, keyboard focus; validation error는 후속 구현 |
 | `FileRow` | hashed; pending·removable은 후속 구현 |
+| `SamplePreset` | default, selected, loading, unavailable |
 | `StageCard` | pending, ready, blocked |
 | `StatusBadge` | ready, pending, attention |
 | `PrimaryButton` | default, hover, focus-visible, disabled; running은 후속 구현 |
@@ -80,4 +81,4 @@ File rows and result stages use only opacity/transform transitions. `prefers-red
 
 ## 8. Accepted Debt
 
-- This static prototype calculates browser-side file hashes only. Real CSV schema inspection, report claim parsing, approved execution contract validation, and Docker rerun remain the `code_runner` execution-adapter task.
+- 로컬 카탈로그는 고정된 `data/samples/` 공개 재현 패키지의 파일 수·보고서 크기만 읽는다. 실제 CSV 스키마 검사, 보고서 Claim 추출, 승인 실행 계약 검증, Docker 재실행은 여전히 `code_runner` 실행 어댑터 작업이다.

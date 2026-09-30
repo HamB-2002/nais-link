@@ -93,7 +93,7 @@ function updateBundleState() {
   bundleStatus.textContent = ready ? "파일 준비 완료" : `${selectedGroupCount()}개 항목 준비`;
   bundleStatus.className = ready ? "status-badge ready" : "status-badge pending";
   preflightNote.textContent = ready
-    ? `보고서 1개 · 데이터 ${state.data.length}개 · 코드 1개가 준비됐습니다. 브라우저 안에서만 해시를 계산했습니다.`
+    ? bundleNote()
     : "세 자료를 선택하면 사전 점검을 시작합니다.";
 }
 
@@ -186,4 +186,11 @@ function reviewSummary() {
     return "공개 샘플의 고정 파일 구조를 확인했습니다. 실제 보고서 Claim 추출, 승인 코드 확인, Docker 재실행은 아직 수행하지 않았습니다.";
   }
   return "파일 구성과 브라우저 해시는 준비됐습니다. 실제 보고서 Claim 추출, 승인 코드 확인, Docker 재실행은 아직 수행하지 않았습니다.";
+}
+
+function bundleNote() {
+  if (state.sourceMode === "catalog") {
+    return `공개 샘플: 보고서 1개 · 데이터 ${state.catalogDataFileCount}개 · 코드 경로 1개를 카탈로그에서 확인했습니다.`;
+  }
+  return `보고서 1개 · 데이터 ${state.data.length}개 · 코드 1개가 준비됐습니다. 브라우저 안에서만 해시를 계산했습니다.`;
 }

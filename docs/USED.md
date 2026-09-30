@@ -30,7 +30,7 @@ Codex, Claude Code, ChatGPT, Copilot, Gemini 등 **쓰는 도구는 전부**, �
 #### 이형호 (@ihertn00)
 | 용도 | 도구 · 모델·버전 |
 |---|---|
-| 숫자내력 프롬프트 설계·수정, 보고서 수치 추출·원본 데이터 및 분석 코드 재실행 대조, Python·R 실행 환경 구성, JSON 결과·Streamlit 검토 화면 구현, Git 저장소 문서화 | Codex · GPT-5 · 정확한 Codex 버전 확인 필요 |
+| 숫자내력 프롬프트 설계·수정, 보고서 수치 추출·원본 데이터 및 분석 코드 재실행 대조, Python·R 실행 환경 구성, JSON 결과·Streamlit 검토 화면 구현, Git 저장소 문서화 | Codex 0.159.2 · gpt-5.6-luna |
 
 #### 신혜원 (@a99812100-blip)
 | 용도 | 도구 · 모델·버전 |

@@ -38,6 +38,44 @@ SourceReportTableArtifact / SourceExecutionTableArtifact (원본 구조·근거 
 - `%`와 ratio, `cm`와 `m`처럼 차원이 호환되는 단위는 승인된 변환식과 원문 단위가 있을 때만 canonical unit으로 기록한다. 변환은 최종 수치 판정을 미리 내리지 않는다.
 - 정규화는 표의 모양을 통일하는 단계일 뿐, 의미 10기준의 `exact` 판정이나 `match` 판정을 만들지 않는다. 의미 근거가 없으면 `unknown`으로 보존한다.
 
+### 0-1. 범용 지표 key와 값 역할 정규화
+
+보고서와 실행 결과는 표시명만으로 연결하지 않는다. 양쪽 셀은 `metric_name`과 별도로 `canonical_metric_key`를 가진다.
+
+```text
+{domain}.{metric}.{variant}.{value_role}[.{group_key}]
+```
+
+`value_role`은 연구 분야와 무관하게 값의 성격을 나타낸다.
+
+```text
+scalar, count, sum, mean, median, minimum, maximum,
+proportion, percentage, ratio, rate, amount,
+coefficient, effect, p_value, confidence_interval,
+ci_lower, ci_upper, correlation, agreement, index,
+date, period
+```
+
+같은 숫자라도 `coefficient`, `effect`, `p_value`처럼 역할이 다르면 같은 지표로 join하지 않는다. 평균·합계·비율·건수·금액·점수·신뢰구간도 역할을 보존한다.
+
+보고서 표현·코드 변수명·출력 열 이름의 alias는 승인된 `metric_alias_registry`만 사용한다.
+
+```json
+{
+  "canonical_metric_key": "survey.satisfaction.overall.mean",
+  "metric_name": "전체 평균 만족도",
+  "value_role": "mean",
+  "metric_aliases": ["overall mean satisfaction", "Avg_Satisfaction"],
+  "metric_alias_registry": {
+    "version": "v1",
+    "hash": "sha256:...",
+    "mapping_id": "satisfaction-overall-001"
+  }
+}
+```
+
+registry에 없는 alias, 지표명만 비슷한 후보, 값이 같은 후보는 자동으로 동일시하지 않는다. key 생성 또는 alias 연결이 불확실하면 `JOIN_KEY_UNRESOLVED`와 `needs_human_review`를 기록한다. 실행 결과에는 양쪽 원문 alias와 최종 canonical key를 모두 보존한다.
+
 `CanonicalTableArtifact`의 셀은 최소 아래 필드를 가진다.
 
 ```text

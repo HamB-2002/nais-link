@@ -16,7 +16,6 @@ Codex, Claude Code, ChatGPT, Copilot, Gemini 등 **쓰는 도구는 전부**, �
 | 용도 | 도구 · 모델·버전 |
 |---|---|
 | 저장소 구성, 시험 자료 탐색·변환·문서화 | Claude Code (데스크톱 앱) · Claude Sonnet 5.5 (`claude-sonnet-5-5`) |
-| `app/` Streamlit 화면 설계·구현 (업로드 → 병렬 처리 → 대조 결과 → 최종 판정) | Claude Code (데스크톱 앱) · Claude Sonnet 5.5 (`claude-sonnet-5-5`) |
 
 #### 김종욱 (@kim0701-bit)
 | 용도 | 도구 · 모델·버전 |
@@ -31,7 +30,7 @@ Codex, Claude Code, ChatGPT, Copilot, Gemini 등 **쓰는 도구는 전부**, �
 #### 이형호 (@ihertn00)
 | 용도 | 도구 · 모델·버전 |
 |---|---|
-| (작성 예정) |  |
+| 숫자내력 프롬프트 설계·수정, 보고서 수치 추출·원본 데이터 및 분석 코드 재실행 대조, Python·R 실행 환경 구성, JSON 결과·Streamlit 검토 화면 구현, Git 저장소 문서화 | Codex · GPT-5 · 정확한 Codex 버전 확인 필요 |
 
 #### 신혜원 (@a99812100-blip)
 | 용도 | 도구 · 모델·버전 |

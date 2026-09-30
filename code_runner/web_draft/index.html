@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="연구보고서, 데이터, 분석 코드의 검증 흐름을 실험하는 숫자내력 로컬 웹 초안"
+    />
+    <title>숫자내력 · 검증 초안</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="숫자내력 검증 초안 처음으로">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>숫자내력</span>
+      </a>
+      <div class="environment"><span class="dot"></span> LOCAL EXPERIMENT</div>
+    </header>
+
+    <main id="top" class="shell">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">THREE-WAY VERIFICATION</p>
+        <h1 id="page-title">보고서 · 데이터 · 코드를<br />한 흐름으로 대조합니다.</h1>
+        <p class="intro-copy">
+          보고서 한 개와 여러 데이터 파일, 분석 코드 한 개를 선택해 검증 준비 상태를 확인하세요.
+          이 화면은 브라우저 안에서 파일 정보와 해시만 확인하는 실험 초안입니다.
+        </p>
+      </section>
+
+      <div class="workspace">
+        <section class="main-column" aria-label="검증 파일 입력과 결과">
+          <section class="panel upload-panel" aria-labelledby="upload-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">INPUT BUNDLE</p>
+                <h2 id="upload-title">검증 자료 선택</h2>
+              </div>
+              <span class="status-badge pending" id="bundle-status">3개 항목 대기</span>
+            </div>
+
+            <div class="upload-grid">
+              <article class="upload-slot" data-slot="report">
+                <div class="slot-index">01</div>
+                <div class="slot-content">
+                  <p class="slot-kicker">연구보고서 · 1개</p>
+                  <h3>보고서 파일</h3>
+                  <p>PDF, HWPX, DOCX, TXT 등</p>
+                  <label class="file-button" for="report-input">보고서 선택</label>
+                  <input id="report-input" type="file" accept=".pdf,.hwp,.hwpx,.docx,.txt,.md" />
+                </div>
+                <ul class="file-list" id="report-list" aria-label="선택한 보고서 파일"></ul>
+              </article>
+
+              <article class="upload-slot" data-slot="data">
+                <div class="slot-index">02</div>
+                <div class="slot-content">
+                  <p class="slot-kicker">원천 데이터 · 여러 개</p>
+                  <h3>데이터 파일</h3>
+                  <p>CSV, XLSX, JSON, Parquet 등</p>
+                  <label class="file-button" for="data-input">데이터 추가</label>
+                  <input id="data-input" type="file" accept=".csv,.xlsx,.xls,.json,.parquet" multiple />
+                </div>
+                <ul class="file-list" id="data-list" aria-label="선택한 데이터 파일"></ul>
+              </article>
+
+              <article class="upload-slot" data-slot="code">
+                <div class="slot-index">03</div>
+                <div class="slot-content">
+                  <p class="slot-kicker">분석 코드 · 1개</p>
+                  <h3>분석 코드</h3>
+                  <p>PY, R, DO, IPYNB, ZIP 등</p>
+                  <label class="file-button" for="code-input">코드 선택</label>
+                  <input id="code-input" type="file" accept=".py,.r,.do,.ipynb,.zip" />
+                </div>
+                <ul class="file-list" id="code-list" aria-label="선택한 분석 코드 파일"></ul>
+              </article>
+            </div>
+
+            <div class="action-row">
+              <p id="preflight-note" class="preflight-note" aria-live="polite">
+                세 자료를 선택하면 사전 점검을 시작합니다.
+              </p>
+              <button id="review-button" class="primary-button" type="button" disabled>
+                사전 점검 시작
+              </button>
+            </div>
+          </section>
+
+          <section class="panel result-panel" aria-labelledby="result-title">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">REVIEW RESULT</p>
+                <h2 id="result-title">삼중 대조 현황</h2>
+              </div>
+              <span class="status-badge pending" id="review-status">점검 전</span>
+            </div>
+
+            <div id="result-summary" class="result-summary" aria-live="polite">
+              <span class="summary-icon" aria-hidden="true">↳</span>
+              <p>파일을 선택한 뒤 사전 점검을 시작하세요. 실제 코드 실행과 수치 판정은 수행하지 않습니다.</p>
+            </div>
+
+            <div class="stage-list" id="stage-list">
+              <article class="stage-card" data-stage="report-data">
+                <div class="stage-number">A</div>
+                <div class="stage-body">
+                  <h3>보고서 ↔ 데이터</h3>
+                  <p>기간·대상·분모·산식 조건 확인</p>
+                </div>
+                <span class="stage-state pending">대기</span>
+              </article>
+              <article class="stage-card" data-stage="code-data">
+                <div class="stage-number">B</div>
+                <div class="stage-body">
+                  <h3>코드 ↔ 데이터</h3>
+                  <p>입력 해시·스키마·변환 조건 확인</p>
+                </div>
+                <span class="stage-state pending">대기</span>
+              </article>
+              <article class="stage-card" data-stage="report-code">
+                <div class="stage-number">C</div>
+                <div class="stage-body">
+                  <h3>보고서 ↔ 코드 실행값</h3>
+                  <p>격리 실행 후 단위·반올림·허용오차 대조</p>
+                </div>
+                <span class="stage-state pending">대기</span>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <aside class="audit-rail" aria-label="검증 안내">
+          <section class="rail-section">
+            <p class="eyebrow">FLOW</p>
+            <ol class="flow-list">
+              <li><span>1</span>파일 구성 확인</li>
+              <li><span>2</span>브라우저 해시 계산</li>
+              <li><span>3</span>승인 계약 확인</li>
+              <li><span>4</span>Docker 재실행</li>
+              <li><span>5</span>근거별 대조</li>
+            </ol>
+          </section>
+          <section class="rail-section notice">
+            <p class="eyebrow">EXPERIMENT MODE</p>
+            <p>
+              현재는 선택한 파일 이름·크기·브라우저 해시만 확인합니다. 업로드 파일은 서버로 전송하거나 실행되지 않습니다.
+            </p>
+          </section>
+          <section class="rail-section contract-status">
+            <p class="eyebrow">EXECUTION CONTRACT</p>
+            <div class="contract-row"><span>승인 코드</span><strong>대기</strong></div>
+            <div class="contract-row"><span>Docker 격리</span><strong>미연결</strong></div>
+            <div class="contract-row"><span>출력 JSON</span><strong>미연결</strong></div>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,174 +1,258 @@
 from dataclasses import replace
 from decimal import Decimal
 
-from code_runner.comparison import evaluate
+import pytest
+
 from code_runner.models import (
     Claim,
+    ComparisonMode,
     ComparisonRequest,
+    EvidenceKind,
+    EvidenceProvenance,
     Execution,
     ExecutionState,
     IsolationState,
     NumericValue,
+    ProofState,
     ReviewStatus,
     SemanticMatch,
+    SourceProof,
+    Threshold,
+    ThresholdOperator,
     Tolerance,
     Trace,
     TraceConfidence,
     Unit,
 )
+from code_runner.workflow import evaluate
 
 
 def test_evaluate_returns_match_when_ratio_rounds_to_reported_percent() -> None:
-    # Given: 동일 의미 조건과 87.5%로 환산되는 비율 실행값
-    request = _request(evidence=NumericValue(Decimal("0.875"), Unit.RATIO))
+    # Given: 87.5% 보고서 값과 동일한 비율 실행값
+    request = _request(NumericValue(Decimal("0.875"), Unit.RATIO))
     request = replace(
         request,
         claim=replace(request.claim, value=NumericValue(Decimal("87.5"), Unit.PERCENT)),
     )
 
-    # When: 보고서 수치와 실행값을 대조하면
+    # When: 검증된 원본 재현값을 대조하면
     result = evaluate(request)
 
-    # Then: 단위 변환 후 일치로 판정한다.
+    # Then: 보고서 단위로 환산·반올림해 일치한다.
     assert result.status is ReviewStatus.MATCH
-    assert result.normalized_evidence == NumericValue(Decimal("87.5"), Unit.PERCENT)
+    assert result.rounded_evidence_in_report_unit == NumericValue(
+        Decimal("87.5"), Unit.PERCENT
+    )
+
+
+@pytest.mark.parametrize(
+    ("claim_value", "evidence", "digits"),
+    [
+        (
+            NumericValue(Decimal(1200), Unit.MILLISECOND),
+            NumericValue(Decimal("1.2"), Unit.SECOND),
+            0,
+        ),
+        (
+            NumericValue(Decimal(1500000), Unit.WON),
+            NumericValue(Decimal("1.5"), Unit.MILLION_WON),
+            0,
+        ),
+        (
+            NumericValue(Decimal("3.5"), Unit.HUNDRED_MILLION_WON),
+            NumericValue(Decimal("3.54"), Unit.HUNDRED_MILLION_WON),
+            1,
+        ),
+    ],
+)
+def test_evaluate_rounds_evidence_in_report_unit(
+    claim_value: NumericValue, evidence: NumericValue, digits: int
+) -> None:
+    # Given: 단위 스케일이 다른 등가값 또는 보고서 자릿수 차이
+    claim = replace(_request(evidence).claim, value=claim_value)
+    request = _request(
+        evidence, claim=claim, tolerance=Tolerance(Decimal(0), None, digits)
+    )
+
+    # When: 보고서 단위로 바꾼 뒤 반올림해 대조하면
+    result = evaluate(request)
+
+    # Then: 정규화 단위 자릿수와 무관하게 일치한다.
+    assert result.status is ReviewStatus.MATCH
+    assert result.rounded_evidence_in_report_unit == claim_value
 
 
 def test_evaluate_returns_mismatch_when_value_exceeds_tolerance() -> None:
-    # Given: 보고서 2.7배보다 허용오차 밖인 재실행 값
-    request = _request(evidence=NumericValue(Decimal("2.41"), Unit.MULTIPLE))
+    # Given: 보고서 2.7배보다 허용오차 밖인 원본 재현값
+    request = _request(NumericValue(Decimal("2.41"), Unit.MULTIPLE))
 
-    # When: 수치를 대조하면
+    # When: 대조하면
     result = evaluate(request)
 
-    # Then: 실행 실패가 아닌 불일치로 판정한다.
+    # Then: 실행 실패가 아닌 불일치다.
     assert result.status is ReviewStatus.MISMATCH
-    assert result.reason_codes == ("VALUE_OUTSIDE_TOLERANCE",)
 
 
-def test_evaluate_returns_not_comparable_when_trace_semantics_differ() -> None:
-    # Given: 기간 조건이 다른 연결 근거
-    trace = Trace(
-        confidence=TraceConfidence.HIGH,
-        metric=SemanticMatch.EXACT,
-        period=SemanticMatch.MISMATCH,
-        population=SemanticMatch.EXACT,
-        denominator=SemanticMatch.EXACT,
-        formula=SemanticMatch.EXACT,
+def test_evaluate_prioritizes_semantic_mismatch_over_execution_failure() -> None:
+    # Given: 기간 불일치와 실행 실패가 함께 존재하는 요청
+    execution = Execution(
+        True,
+        IsolationState.AVAILABLE,
+        ExecutionState.FAILED,
+        None,
+        provenance=_source_provenance(),
     )
-    request = _request(evidence=NumericValue(Decimal("2.7"), Unit.MULTIPLE), trace=trace)
 
-    # When: 수치를 대조하면
-    result = evaluate(request)
+    # When: 상태를 대조하면
+    result = evaluate(
+        _request(None, trace=_trace(period=SemanticMatch.MISMATCH), execution=execution)
+    )
 
-    # Then: 숫자가 같아도 비교 불가다.
+    # Then: 실행 실패가 아닌 비교 불가를 먼저 반환한다.
     assert result.status is ReviewStatus.NOT_COMPARABLE
 
 
-def test_evaluate_returns_evidence_incomplete_when_contract_is_missing() -> None:
-    # Given: 실행 계약이 완성되지 않은 요청
-    execution = Execution(
-        contract_complete=False,
-        isolation=IsolationState.AVAILABLE,
-        state=ExecutionState.NOT_STARTED,
-        evidence=None,
-    )
-    request = _request(evidence=None, execution=execution)
+def test_evaluate_prioritizes_semantic_mismatch_over_low_confidence() -> None:
+    # Given: 명백한 분모 불일치와 낮은 Trace 신뢰도
+    trace = _trace(confidence=TraceConfidence.LOW, denominator=SemanticMatch.MISMATCH)
 
-    # When: 대조를 요청하면
+    # When: 상태를 대조하면
+    result = evaluate(
+        _request(NumericValue(Decimal("2.7"), Unit.MULTIPLE), trace=trace)
+    )
+
+    # Then: 사람이 검토하기 전 비교 불가를 반환한다.
+    assert result.status is ReviewStatus.NOT_COMPARABLE
+
+
+def test_evaluate_returns_evidence_incomplete_without_provenance() -> None:
+    # Given: 원본 재현 근거가 빠진 기존 형태의 완료 요청
+    execution = Execution(
+        True,
+        IsolationState.AVAILABLE,
+        ExecutionState.COMPLETED,
+        NumericValue(Decimal("2.7"), Unit.MULTIPLE),
+    )
+
+    # When: 대조하면
+    result = evaluate(_request(None, execution=execution))
+
+    # Then: 자동 일치 판정을 만들지 않는다.
+    assert result.reason_codes == ("EVIDENCE_PROVENANCE_MISSING",)
+
+
+def test_evaluate_returns_human_review_for_independent_recalculation() -> None:
+    # Given: 표를 바탕으로 한 독립 재계산 결과
+    execution = Execution(
+        True,
+        IsolationState.AVAILABLE,
+        ExecutionState.COMPLETED,
+        NumericValue(Decimal("2.7"), Unit.MULTIPLE),
+        provenance=_independent_provenance(),
+    )
+
+    # When: 계산값이 같아도 대조하면
+    result = evaluate(_request(None, execution=execution))
+
+    # Then: 원본 재현이 아닌 사람 검토 결과와 disclosure를 남긴다.
+    assert result.status is ReviewStatus.NEEDS_HUMAN_REVIEW
+    assert result.disclosure is not None
+
+
+def test_evaluate_supports_threshold_probability_condition() -> None:
+    # Given: p < 0.001 임계값 Claim과 검증된 원본 재현값
+    claim = Claim(
+        "P-001",
+        NumericValue(Decimal("0.001"), Unit.PERCENT),
+        "p-value",
+        "2025",
+        "A",
+        "test",
+        comparison_mode=ComparisonMode.THRESHOLD,
+        threshold=Threshold(
+            ThresholdOperator.LESS_THAN, NumericValue(Decimal("0.001"), Unit.PERCENT)
+        ),
+    )
+    request = _request(NumericValue(Decimal("0.0009"), Unit.PERCENT), claim=claim)
+
+    # When: 부등식 정책으로 대조하면
     result = evaluate(request)
 
-    # Then: 실행하지 않고 근거 부족을 반환한다.
-    assert result.status is ReviewStatus.EVIDENCE_INCOMPLETE
+    # Then: 숫자 동등 비교가 아닌 임계값 만족으로 판정한다.
+    assert result.reason_codes == ("THRESHOLD_SATISFIED",)
 
 
-def test_evaluate_returns_isolation_unavailable_without_executing_code() -> None:
-    # Given: Docker 격리 환경을 확인할 수 없는 요청
+def test_evaluate_keeps_isolation_unavailable_before_provenance() -> None:
+    # Given: Docker를 확인할 수 없는 요청
     execution = Execution(
-        contract_complete=True,
-        isolation=IsolationState.UNAVAILABLE,
-        state=ExecutionState.NOT_STARTED,
-        evidence=None,
+        True, IsolationState.UNAVAILABLE, ExecutionState.NOT_STARTED, None
     )
-    request = _request(evidence=None, execution=execution)
 
-    # When: 대조를 요청하면
-    result = evaluate(request)
+    # When: 대조하면
+    result = evaluate(_request(None, execution=execution))
 
     # Then: 로컬 실행 대신 격리 불가를 반환한다.
     assert result.status is ReviewStatus.ISOLATION_UNAVAILABLE
-
-
-def test_evaluate_returns_execution_failed_when_isolated_run_fails() -> None:
-    # Given: Docker는 가능하지만 실행이 실패한 요청
-    execution = Execution(
-        contract_complete=True,
-        isolation=IsolationState.AVAILABLE,
-        state=ExecutionState.FAILED,
-        evidence=None,
-    )
-    request = _request(evidence=None, execution=execution)
-
-    # When: 대조를 요청하면
-    result = evaluate(request)
-
-    # Then: 값 불일치가 아닌 실행 실패를 반환한다.
-    assert result.status is ReviewStatus.EXECUTION_FAILED
-
-
-def test_evaluate_returns_needs_human_review_when_trace_confidence_is_low() -> None:
-    # Given: 자동 연결 신뢰도가 낮은 Trace
-    trace = Trace(
-        confidence=TraceConfidence.LOW,
-        metric=SemanticMatch.EXACT,
-        period=SemanticMatch.EXACT,
-        population=SemanticMatch.EXACT,
-        denominator=SemanticMatch.EXACT,
-        formula=SemanticMatch.EXACT,
-    )
-    request = _request(evidence=NumericValue(Decimal("2.7"), Unit.MULTIPLE), trace=trace)
-
-    # When: 대조를 요청하면
-    result = evaluate(request)
-
-    # Then: 사람이 연결 근거를 확인해야 한다.
-    assert result.status is ReviewStatus.NEEDS_HUMAN_REVIEW
 
 
 def _request(
     evidence: NumericValue | None,
     trace: Trace | None = None,
     execution: Execution | None = None,
+    claim: Claim | None = None,
+    tolerance: Tolerance | None = None,
 ) -> ComparisonRequest:
-    claim = Claim(
-        claim_id="C-042",
-        value=NumericValue(Decimal("2.7"), Unit.MULTIPLE),
-        metric="처리 속도 개선 배수",
-        period="2025년 실험",
-        population="시험 데이터셋 A",
-        denominator="기존 방법 평균 처리 시간",
+    base_claim = Claim(
+        "C-042",
+        NumericValue(Decimal("2.7"), Unit.MULTIPLE),
+        "처리 속도 개선 배수",
+        "2025년 실험",
+        "시험 데이터셋 A",
+        "기존 방법 평균 처리 시간",
     )
-    exact_trace = Trace(
-        confidence=TraceConfidence.HIGH,
-        metric=SemanticMatch.EXACT,
-        period=SemanticMatch.EXACT,
-        population=SemanticMatch.EXACT,
-        denominator=SemanticMatch.EXACT,
-        formula=SemanticMatch.EXACT,
-    )
-    completed_execution = Execution(
-        contract_complete=True,
-        isolation=IsolationState.AVAILABLE,
-        state=ExecutionState.COMPLETED,
-        evidence=evidence,
+    base_execution = Execution(
+        True,
+        IsolationState.AVAILABLE,
+        ExecutionState.COMPLETED,
+        evidence,
+        provenance=_source_provenance(),
     )
     return ComparisonRequest(
-        claim=claim,
-        trace=exact_trace if trace is None else trace,
-        execution=completed_execution if execution is None else execution,
-        tolerance=Tolerance(
-            absolute=Decimal("0.05"),
-            relative=None,
-            rounding_digits=1,
-        ),
+        claim or base_claim,
+        trace or _trace(),
+        execution or base_execution,
+        tolerance or Tolerance(Decimal("0.05"), None, 1),
+    )
+
+
+def _trace(
+    confidence: TraceConfidence = TraceConfidence.HIGH,
+    period: SemanticMatch = SemanticMatch.EXACT,
+    denominator: SemanticMatch = SemanticMatch.EXACT,
+) -> Trace:
+    return Trace(
+        confidence,
+        SemanticMatch.EXACT,
+        period,
+        SemanticMatch.EXACT,
+        denominator,
+        SemanticMatch.EXACT,
+    )
+
+
+def _source_provenance() -> EvidenceProvenance:
+    verified = SourceProof(ProofState.VERIFIED, "sha256:verified")
+    return EvidenceProvenance(
+        EvidenceKind.SOURCE_REPRODUCTION, verified, verified, verified
+    )
+
+
+def _independent_provenance() -> EvidenceProvenance:
+    missing = SourceProof(ProofState.MISSING, None)
+    return EvidenceProvenance(
+        EvidenceKind.INDEPENDENT_RECALCULATION,
+        missing,
+        missing,
+        missing,
+        formula_proof="paper_text_and_table",
     )

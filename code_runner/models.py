@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
 
@@ -47,10 +47,82 @@ class ReviewStatus(str, Enum):
     NEEDS_HUMAN_REVIEW = "needs_human_review"
 
 
+class EvidenceKind(str, Enum):
+    SOURCE_REPRODUCTION = "source_reproduction"
+    INDEPENDENT_RECALCULATION = "independent_recalculation"
+    ARITHMETIC_CHECK = "arithmetic_check"
+
+
+class ProofState(str, Enum):
+    VERIFIED = "verified"
+    MISSING = "missing"
+    UNKNOWN = "unknown"
+
+
+class SourceKind(str, Enum):
+    RESEARCH_RESULT = "research_result"
+    PUBLISHED_EXAMPLE = "published_example"
+    DERIVED_SUMMARY = "derived_summary"
+    QUOTED_STATISTIC = "quoted_statistic"
+
+
+class ComparisonMode(str, Enum):
+    EXACT_VALUE = "exact_value"
+    ROUNDED_INTERVAL = "rounded_interval"
+    THRESHOLD = "threshold"
+
+
+class ThresholdOperator(str, Enum):
+    LESS_THAN = "less_than"
+    LESS_THAN_OR_EQUAL = "less_than_or_equal"
+    GREATER_THAN = "greater_than"
+    GREATER_THAN_OR_EQUAL = "greater_than_or_equal"
+
+
+class ToleranceUnit(str, Enum):
+    CANONICAL = "canonical"
+    REPORT = "report"
+
+
 @dataclass(frozen=True, slots=True)
 class NumericValue:
     amount: Decimal
     unit: Unit
+
+
+@dataclass(frozen=True, slots=True)
+class SourceProof:
+    state: ProofState
+    reference: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceProvenance:
+    kind: EvidenceKind
+    original_code: SourceProof
+    original_data: SourceProof
+    original_execution: SourceProof
+    formula_proof: str | None = None
+    disclosure: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SourceMetadata:
+    source_kind: SourceKind
+    research_result: bool | None
+    file_sha256: str | None = None
+    table_id: str | None = None
+    row: str | None = None
+    column: str | None = None
+    cell_text: str | None = None
+    context_text: str | None = None
+    interpretation_scope: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Threshold:
+    operator: ThresholdOperator
+    value: NumericValue
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +133,12 @@ class Claim:
     period: str
     population: str
     denominator: str
+    raw_value: str | None = field(default=None, kw_only=True)
+    source: SourceMetadata | None = field(default=None, kw_only=True)
+    comparison_mode: ComparisonMode = field(
+        default=ComparisonMode.ROUNDED_INTERVAL, kw_only=True
+    )
+    threshold: Threshold | None = field(default=None, kw_only=True)
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,6 +157,7 @@ class Execution:
     isolation: IsolationState
     state: ExecutionState
     evidence: NumericValue | None
+    provenance: EvidenceProvenance | None = field(default=None, kw_only=True)
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,6 +165,7 @@ class Tolerance:
     absolute: Decimal
     relative: Decimal | None
     rounding_digits: int
+    absolute_unit: ToleranceUnit = field(default=ToleranceUnit.CANONICAL, kw_only=True)
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,3 +184,8 @@ class ReviewResult:
     normalized_evidence: NumericValue | None
     absolute_difference: Decimal | None
     relative_difference: Decimal | None
+    evidence_in_report_unit: NumericValue | None = field(default=None, kw_only=True)
+    rounded_evidence_in_report_unit: NumericValue | None = field(
+        default=None, kw_only=True
+    )
+    disclosure: str | None = field(default=None, kw_only=True)

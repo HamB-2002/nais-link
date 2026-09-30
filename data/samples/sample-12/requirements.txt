@@ -1,0 +1,20 @@
+# 데이터 처리 및 분석
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+statsmodels>=0.14.0
+scikit-learn>=1.3.0
+
+# 한국어 자연어 처리 (NLP)
+kiwipiepy>=0.16.0
+
+# 데이터 시각화
+matplotlib>=3.7.0
+seaborn>=0.12.0
+koreanize-matplotlib>=0.1.1
+wordcloud>=1.9.0
+
+# 음원 차트 및 가사 데이터 수집기 (Collector)
+curl_cffi>=0.7.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0

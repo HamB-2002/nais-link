@@ -1,0 +1,13 @@
+{
+  "n_scored": 11,
+  "n_insufficient_evidence_excluded": 11,
+  "overall_mean_ovis_pct": 60.0,
+  "overall_std_ovis_pct": 20.0,
+  "outcome_only_mean_MV_pct": 16.7,
+  "process_aware_mean_MV_pct": 100.0,
+  "outcome_only_mean_OVIS_pct": 50.0,
+  "process_aware_mean_OVIS_pct": 67.5,
+  "n_outcome_only": 6,
+  "n_process_aware": 4,
+  "n_audited_outcome": 1
+}

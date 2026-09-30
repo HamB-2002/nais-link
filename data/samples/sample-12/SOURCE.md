@@ -11,6 +11,7 @@
   - 데이터: `datasets/` (공개 곡별 지표 CSV), `output/analysis_tables/` (저장된 결과표)
 - 개인정보 포함 여부: 없음 — 가사 원문은 원 저자가 공개하지 않았다. 공개 차트의 곡 제목과 가수명만 있다.
 - 원본 그대로 여부: 예 — 아래 뺀 파일을 제외하면 원본 커밋과 Git 해시가 모두 일치한다.
+- hwpx 변환본: `sample-12-hwpx`
 - 뺀 파일: `scripts/downloader/`(가사 수집기, 분석 코드가 사용하지 않음), `output/analysis_figures/`(추가 그림), `.gitignore`
 
 ## 알아둘 점 (보고서와 데이터가 일부러 다르다)

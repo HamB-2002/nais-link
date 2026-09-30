@@ -47,7 +47,8 @@ Codex, Claude Code, ChatGPT, Copilot, Gemini 등 **쓰는 도구는 전부**, �
 ## 오픈소스
 | 이름 | 라이선스 | 용도 | 파트 |
 |---|---|---|---|
-| pypandoc-hwpx 0.1.1 | MIT | docx→hwpx 변환 (`sample-10-hwpx` 생성) | 시험 자료 준비 |
+| pypandoc-hwpx 0.1.1 | MIT | docx·md·LaTeX→hwpx 변환 (`sample-10-hwpx`, `sample-12-hwpx`, `sample-13-hwpx` 생성) | 시험 자료 준비 |
+| Pillow 12.3.0 | MIT-CMU | 위 변환 도구가 그림 크기를 계산하는 데 쓰는 의존 패키지 (저장소에 포함하지 않음) | 시험 자료 준비 |
 | pypandoc 1.17 (pypandoc_binary) / Pandoc 3.9 | MIT / GPL-2.0-or-later | 위 변환의 실행 엔진 (실행 도구로만 사용) | 시험 자료 준비 |
 | python-hwpx 6.6.0 | Apache-2.0 | 변환본이 hwpx로 열리는지 구조 확인 | 시험 자료 준비 |
 | python-docx / lxml | MIT / BSD-3-Clause | 변환 전후 표·글자·숫자 비교 검증, docx 그림 제거(`sample-11-modified`) | 시험 자료 준비 |

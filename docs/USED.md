@@ -16,6 +16,7 @@ Codex, Claude Code, ChatGPT, Copilot, Gemini 등 **쓰는 도구는 전부**, �
 | 용도 | 도구 · 모델·버전 |
 |---|---|
 | 저장소 구성, 시험 자료 탐색·변환·문서화 | Claude Code (데스크톱 앱) · Claude Sonnet 5.5 (`claude-sonnet-5-5`) |
+| `app/` Streamlit 화면 설계·구현 (업로드 → 병렬 처리 → 대조 결과 → 최종 판정) | Claude Code (데스크톱 앱) · Claude Sonnet 5.5 (`claude-sonnet-5-5`) |
 
 #### 김종욱 (@kim0701-bit)
 | 용도 | 도구 · 모델·버전 |

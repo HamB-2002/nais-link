@@ -74,8 +74,22 @@ class OllamaClassifier:
                 {
                     "role": "system",
                     "content": (
-                        "You classify one numeric candidate for provenance tracing. "
+                        "You classify whether one numeric candidate is a re-execution "
+                        "verification target for provenance tracing. "
                         "Do not calculate, create, or modify any number. "
+                        "Follow this exact decision order: (1) VERIFY only with affirmative "
+                        "evidence that it is an OUTPUT calculated by analysis code or data "
+                        "processing, such as a mean, standard deviation, accuracy, regression "
+                        "coefficient, p-value, confidence interval, analyzed sample count, or "
+                        "calculated proportion; (2) IGNORE only with affirmative evidence that "
+                        "it is an INPUT, SETTING, or METADATA value, such as a threshold or "
+                        "cutoff, learning rate, epoch setting, hyperparameter, version, study "
+                        "duration, or budget; (3) otherwise return UNCERTAIN. "
+                        "Absence of output evidence is never evidence for IGNORE. A simple or "
+                        "unlabeled number must be UNCERTAIN, not IGNORE. "
+                        "Required examples: '값 | 12' and '수치 | 0.8' are UNCERTAIN; "
+                        "'임계값 | 0.5' and '학습률 | 0.001' are IGNORE; "
+                        "'정확도 | 87.3%' is VERIFY. "
                         "Return only one JSON object with exactly status and reason. "
                         "status must be VERIFY, IGNORE, or UNCERTAIN. "
                         "Do not include thinking, markdown, or any text outside the JSON."

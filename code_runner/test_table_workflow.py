@@ -1,3 +1,4 @@
+from dataclasses import replace
 from decimal import Decimal
 
 from code_runner.models import (
@@ -6,6 +7,7 @@ from code_runner.models import (
     Execution,
     ExecutionState,
     IsolationState,
+    MetricFamily,
     NumericValue,
     ProofState,
     ReviewStatus,
@@ -13,6 +15,8 @@ from code_runner.models import (
     SourceMetadata,
     SourceProof,
     Tolerance,
+    TolerancePolicy,
+    TolerancePolicySource,
     Unit,
 )
 from code_runner.table_models import (
@@ -91,6 +95,60 @@ def test_reconcile_tables_keeps_tied_table_candidates_for_review() -> None:
     comparison = result.comparisons[0]
     assert comparison.status is TablePairStatus.AMBIGUOUS
     assert comparison.cell_results[0].status is ReviewStatus.NEEDS_HUMAN_REVIEW
+
+
+def test_reconcile_tables_holds_generic_metric_without_tolerance_policy() -> None:
+    # Given: 지표별 허용오차 근거가 없는 일반 지수 표 셀
+    report_cell = replace(
+        _report_cell(),
+        semantics=replace(_report_cell().semantics, metric="삶의 질 종합 지수"),
+        value=NumericValue(Decimal("15.0"), Unit.MULTIPLE),
+    )
+    execution_cell = replace(
+        _execution_cell(),
+        semantics=replace(_execution_cell().semantics, metric="삶의 질 종합 지수"),
+        value=NumericValue(Decimal("15.02"), Unit.MULTIPLE),
+        execution=replace(
+            _execution_cell().execution,
+            evidence=NumericValue(Decimal("15.02"), Unit.MULTIPLE),
+        ),
+    )
+    report = _report_table("report-3", "삶의 질 요약", (report_cell,))
+    execution = _execution_table("output-a", "삶의 질 요약", (execution_cell,))
+
+    # When: 자동 표 대조를 수행하면
+    result = reconcile_tables((report,), (execution,))
+
+    # Then: 임의의 공통 허용오차로 일치시키지 않고 검토로 보낸다.
+    cell = result.comparisons[0].cell_results[0]
+    assert cell.status is ReviewStatus.NEEDS_HUMAN_REVIEW
+    assert cell.reason_codes == ("TOLERANCE_POLICY_MISSING",)
+
+
+def test_reconcile_tables_prioritizes_report_declared_tolerance_policy() -> None:
+    # Given: 비율 카탈로그보다 더 엄격한 보고서 선언 허용오차
+    report_cell = replace(
+        _report_cell(),
+        tolerance_policy=TolerancePolicy(
+            "report.table-3.precision",
+            MetricFamily.RATE,
+            Tolerance(Decimal("0.01"), None, 2),
+            TolerancePolicySource.REPORT_DECLARED,
+            "표 3 각주의 재현 허용오차",
+            "표 3 각주",
+        ),
+    )
+    report = _report_table("report-3", "서울 만족도 요약", (report_cell,))
+    execution = _execution_table("output-a", "서울 만족도 요약", (_execution_cell(),))
+
+    # When: 보고서 자릿수까지 보존한 0.02%p 차이의 실행값을 대조하면
+    result = reconcile_tables((report,), (execution,))
+
+    # Then: 0.1%p·한 자리 카탈로그가 아닌 보고서 선언 정책으로 불일치가 된다.
+    cell = result.comparisons[0].cell_results[0]
+    assert cell.status is ReviewStatus.MISMATCH
+    assert cell.tolerance_policy is not None
+    assert cell.tolerance_policy.policy_id == "report.table-3.precision"
 
 
 def _report_table(

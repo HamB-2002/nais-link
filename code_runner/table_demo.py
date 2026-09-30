@@ -83,6 +83,7 @@ def _cell_payload(cell: CellComparison) -> dict[str, JsonValue]:
         "status": cell.status.value,
         "reason_codes": list(cell.reason_codes),
         "output_locator": cell.output_locator,
+        "tolerance_policy": _policy_payload(cell),
     }
 
 
@@ -96,6 +97,22 @@ def _coordinate_payload(coordinate: TableCoordinate) -> dict[str, JsonValue]:
 
 def _numeric_payload(value: NumericValue) -> dict[str, JsonValue]:
     return {"value": str(value.amount), "unit": value.unit.value}
+
+
+def _policy_payload(cell: CellComparison) -> dict[str, JsonValue] | None:
+    policy = cell.tolerance_policy
+    if policy is None:
+        return None
+    return {
+        "id": policy.policy_id,
+        "family": policy.metric_family.value,
+        "source": policy.source.value,
+        "absolute": str(policy.tolerance.absolute),
+        "relative": None if policy.tolerance.relative is None else str(policy.tolerance.relative),
+        "rounding_digits": policy.tolerance.rounding_digits,
+        "rationale": policy.rationale,
+        "source_locator": policy.source_locator,
+    }
 
 
 def _report_table() -> ReportTableArtifact:

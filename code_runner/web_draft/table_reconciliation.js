@@ -109,6 +109,7 @@ function renderCell(cell) {
   article.append(detail("보고서", formatNumeric(cell.reported)));
   article.append(detail("코드 실행", cell.execution ? formatNumeric(cell.execution) : "출력 셀 없음"));
   article.append(detail("판정 근거", cell.reason_codes.join(" · ")));
+  article.append(detail("허용오차 정책", formatPolicy(cell.tolerance_policy)));
   if (cell.output_locator) article.append(detail("출력 위치", cell.output_locator));
   return article;
 }
@@ -130,6 +131,12 @@ function formatCoordinate(coordinate) {
 
 function formatNumeric(value) {
   return `${value.value}${value.unit}`;
+}
+
+function formatPolicy(policy) {
+  if (!policy) return "정책 근거 없음 · 자동 판정 보류";
+  const relative = policy.relative === null ? "없음" : policy.relative;
+  return `${policy.id} · 절대 ${policy.absolute} · 상대 ${relative} · 반올림 ${policy.rounding_digits}자리 · ${policy.source} · ${policy.rationale}`;
 }
 
 function statusClass(status) {

@@ -24,6 +24,7 @@ from code_runner.models import (
     TraceConfidence,
     Unit,
 )
+from code_runner.tolerance_policy import catalog_policy
 from code_runner.workflow import evaluate
 
 
@@ -91,6 +92,42 @@ def test_evaluate_returns_mismatch_when_value_exceeds_tolerance() -> None:
 
     # Then: 실행 실패가 아닌 불일치다.
     assert result.status is ReviewStatus.MISMATCH
+
+
+@pytest.mark.parametrize(
+    ("metric", "claim_value", "evidence", "expected_status"),
+    [
+        (
+            "평균 신장",
+            NumericValue(Decimal("170.0"), Unit.CENTIMETER),
+            NumericValue(Decimal("170.4"), Unit.CENTIMETER),
+            ReviewStatus.MATCH,
+        ),
+        (
+            "평균 체중",
+            NumericValue(Decimal("70.0"), Unit.KILOGRAM),
+            NumericValue(Decimal("70.4"), Unit.KILOGRAM),
+            ReviewStatus.MISMATCH,
+        ),
+    ],
+)
+def test_evaluate_uses_metric_specific_tolerance_policy(
+    metric: str,
+    claim_value: NumericValue,
+    evidence: NumericValue,
+    expected_status: ReviewStatus,
+) -> None:
+    # Given: 동일한 0.4 차이지만 신장과 체중의 승인 정책이 다른 Claim
+    policy = catalog_policy(metric, claim_value.unit)
+    assert policy is not None
+    claim = replace(_request(evidence).claim, metric=metric, value=claim_value)
+    request = _request(evidence, claim=claim, tolerance=policy.tolerance)
+
+    # When: 승인된 정책의 허용오차로 대조하면
+    result = evaluate(request)
+
+    # Then: 신장은 일치, 체중은 불일치로 구분한다.
+    assert result.status is expected_status
 
 
 def test_evaluate_prioritizes_semantic_mismatch_over_execution_failure() -> None:

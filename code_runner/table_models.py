@@ -8,6 +8,7 @@ from code_runner.models import (
     ReviewStatus,
     SourceMetadata,
     Tolerance,
+    TolerancePolicy,
 )
 
 
@@ -41,6 +42,7 @@ class ReportTableCell:
     semantics: QuantitySemantics
     source: SourceMetadata
     tolerance: Tolerance
+    tolerance_policy: TolerancePolicy | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +87,7 @@ class CellComparison:
     reason_codes: tuple[str, ...]
     review: ReviewResult | None
     output_locator: str | None
+    tolerance_policy: TolerancePolicy | None
 
 
 @dataclass(frozen=True, slots=True)

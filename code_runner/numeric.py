@@ -12,6 +12,8 @@ class Dimension(str, Enum):
     MONEY = "money"
     TIME = "time"
     PERCENTAGE_POINT = "percentage_point"
+    LENGTH = "length"
+    MASS = "mass"
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +52,18 @@ def normalize(value: NumericValue) -> CanonicalValue:
         case Unit.PERCENTAGE_POINT:
             return CanonicalValue(
                 value.amount, Unit.PERCENTAGE_POINT, Dimension.PERCENTAGE_POINT
+            )
+        case Unit.CENTIMETER:
+            return CanonicalValue(value.amount, Unit.CENTIMETER, Dimension.LENGTH)
+        case Unit.METER:
+            return CanonicalValue(
+                value.amount * Decimal(100), Unit.CENTIMETER, Dimension.LENGTH
+            )
+        case Unit.KILOGRAM:
+            return CanonicalValue(value.amount, Unit.KILOGRAM, Dimension.MASS)
+        case Unit.GRAM:
+            return CanonicalValue(
+                value.amount / Decimal(1000), Unit.KILOGRAM, Dimension.MASS
             )
         case unreachable:
             assert_never(unreachable)

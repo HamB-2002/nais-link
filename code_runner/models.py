@@ -13,6 +13,10 @@ class Unit(str, Enum):
     MILLISECOND = "ms"
     SECOND = "s"
     PERCENTAGE_POINT = "%p"
+    CENTIMETER = "cm"
+    METER = "m"
+    KILOGRAM = "kg"
+    GRAM = "g"
 
 
 class TraceConfidence(str, Enum):
@@ -82,6 +86,21 @@ class ThresholdOperator(str, Enum):
 class ToleranceUnit(str, Enum):
     CANONICAL = "canonical"
     REPORT = "report"
+
+
+class MetricFamily(str, Enum):
+    BODY_HEIGHT = "body_height"
+    BODY_WEIGHT = "body_weight"
+    RATE = "rate"
+    COUNT = "count"
+    MONEY = "money"
+    DURATION = "duration"
+    GENERIC = "generic"
+
+
+class TolerancePolicySource(str, Enum):
+    REPORT_DECLARED = "report_declared"
+    APPROVED_METRIC_CATALOG = "approved_metric_catalog"
 
 
 @dataclass(frozen=True, slots=True)
@@ -166,6 +185,16 @@ class Tolerance:
     relative: Decimal | None
     rounding_digits: int
     absolute_unit: ToleranceUnit = field(default=ToleranceUnit.CANONICAL, kw_only=True)
+
+
+@dataclass(frozen=True, slots=True)
+class TolerancePolicy:
+    policy_id: str
+    metric_family: MetricFamily
+    tolerance: Tolerance
+    source: TolerancePolicySource
+    rationale: str
+    source_locator: str | None
 
 
 @dataclass(frozen=True, slots=True)

@@ -21,6 +21,7 @@ from code_runner.table_models import (
     TableCoordinate,
     TablePairStatus,
 )
+from code_runner.tolerance_policy import policy_for
 from code_runner.workflow import evaluate
 
 
@@ -62,11 +63,25 @@ def compare_cell(
                 ("EXECUTION_CELL_MISSING",),
                 None,
                 None,
+                None,
             )
         case (execution,):
+            policy = policy_for(report.semantics, report.value, report.tolerance_policy)
+            if policy is None:
+                return CellComparison(
+                    report.coordinate,
+                    execution.coordinate,
+                    report.value,
+                    execution.value,
+                    ReviewStatus.NEEDS_HUMAN_REVIEW,
+                    ("TOLERANCE_POLICY_MISSING",),
+                    None,
+                    execution.output_locator,
+                    None,
+                )
             trace = trace_for(report.semantics, execution.semantics)
             request = ComparisonRequest(
-                claim_for(report), trace, replace(execution.execution, evidence=execution.value), report.tolerance
+                claim_for(report), trace, replace(execution.execution, evidence=execution.value), policy.tolerance
             )
             review = evaluate(request)
             return CellComparison(
@@ -78,6 +93,7 @@ def compare_cell(
                 review.reason_codes,
                 review,
                 execution.output_locator,
+                policy,
             )
         case _:
             return CellComparison(
@@ -87,6 +103,7 @@ def compare_cell(
                 None,
                 ReviewStatus.NEEDS_HUMAN_REVIEW,
                 ("DUPLICATE_EXECUTION_CELL_KEY",),
+                None,
                 None,
                 None,
             )

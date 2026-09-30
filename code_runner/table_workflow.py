@@ -106,6 +106,7 @@ def _unmatched_table(report: ReportTableArtifact) -> TableComparison:
             ("NO_EXECUTION_TABLE_CANDIDATE",),
             None,
             None,
+            None,
         )
         for cell in report.cells
     )
@@ -136,6 +137,7 @@ def _ambiguous_table(
             None,
             ReviewStatus.NEEDS_HUMAN_REVIEW,
             (reason,),
+            None,
             None,
             None,
         )

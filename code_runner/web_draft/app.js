@@ -45,7 +45,7 @@ for (const button of sampleButtons) {
   button.addEventListener("click", () => loadSample(button.dataset.sample));
 }
 
-reviewButton.addEventListener("click", () => {
+reviewButton.addEventListener("click", async () => {
   const dataCount = state.sourceMode === "catalog" ? state.catalogDataFileCount : state.data.length;
   setStage("report-data", "attention", "대기", "보고서 의미 조건은 파서 연결 후 확인");
   setStage("code-data", "ready", "준비", codeDataDetail(dataCount));
@@ -53,6 +53,15 @@ reviewButton.addEventListener("click", () => {
   reviewStatus.textContent = "실험 결과";
   reviewStatus.className = "status-badge attention";
   resultSummary.textContent = reviewSummary();
+  if (state.sourceMode === "catalog") {
+    const loaded = await window.loadTableReconciliation();
+    if (loaded) {
+      setStage("report-code", "ready", "표 대조 데모", "구조화된 table artifact fixture의 자동 연결 결과 표시");
+      reviewStatus.textContent = "표 대조 데모";
+      reviewStatus.className = "status-badge ready";
+      resultSummary.textContent = "구조화된 보고서 표와 코드 실행 표를 자동 연결해 셀 단위로 대조했습니다. 업로드 파일 파싱과 Docker 실행은 아직 연결되지 않았습니다.";
+    }
+  }
 });
 
 async function prepareFiles(files) {
@@ -117,6 +126,7 @@ function resetReviewState() {
   reviewStatus.textContent = "점검 전";
   reviewStatus.className = "status-badge pending";
   resultSummary.textContent = "파일을 선택한 뒤 사전 점검을 시작하세요. 실제 코드 실행과 수치 판정은 수행하지 않습니다.";
+  window.resetTableReconciliation();
 }
 
 function formatBytes(bytes) {

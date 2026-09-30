@@ -64,6 +64,7 @@ Near-black canvas와 미세한 luminance stack을 사용한다. 표면은 옅은
 | `SamplePreset` | default, selected, loading, unavailable |
 | `NumberDecisionWorkbench` | match, mismatch, not-comparable, input-required |
 | `AutoRecoveryTrail` | direct-recovered, no-alternative, derived-review, recovery-blocked |
+| `TableReconciliationResult` | hidden, loading, completed, failed; matched/ambiguous/unmatched table pair; match/mismatch/not-comparable/review cell |
 | `StageCard` | pending, ready, blocked |
 | `StatusBadge` | ready, pending, attention |
 | `PrimaryButton` | default, hover, focus-visible, disabled; running은 후속 구현 |
@@ -87,3 +88,4 @@ File rows and result stages use only opacity/transform transitions. `prefers-red
 
 - 로컬 카탈로그는 고정된 `data/samples/` 공개 재현 패키지의 파일 수·보고서 크기만 읽는다. 실제 CSV 스키마 검사, 보고서 Claim 추출, 승인 실행 계약 검증, Docker 재실행은 여전히 `code_runner` 실행 어댑터 작업이다.
 - 자동 복구 워크벤치는 현재 시나리오 기반 UI 프로토타입이다. 실제 Claim·Provenance 자동 연결 엔진이 반환하는 복구 이력과 아직 연결되지 않았다.
+- 자동 표 대조 결과는 구조화된 fixture artifact를 서버의 실제 table reconciliation 엔진에 통과시킨 데모다. 업로드 보고서 파싱과 Docker 실행 output artifact 연결은 여전히 실행 어댑터 범위다.

@@ -4,7 +4,7 @@
 
 | 종류 | 위치 |
 |---|---|
-| 연구보고서 (hwpx) | `report.hwpx` |
+| 연구보고서 (hwpx · docx · pdf · hwp · tex 등 문서 형식 무관) | `report.<확장자>` (예: `report.pdf`) |
 | 분석 코드 | `code/` |
 | 연구에 사용된 데이터 | `data/` |
 
@@ -13,7 +13,7 @@
 ```
 data/samples/
   sample-01/               ← 원본 그대로
-    report.hwpx
+    report.<확장자>        ← hwpx, docx, pdf, hwp, tex 등
     code/
     data/
     SOURCE.md              ← 출처·라이선스 (필수)

@@ -1,0 +1,17 @@
+# secrets — this repo is PUBLIC
+.env
+.env.*
+*.key
+secrets/
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+# run outputs (keep sample outputs in data/samples only)
+out/
+*.log

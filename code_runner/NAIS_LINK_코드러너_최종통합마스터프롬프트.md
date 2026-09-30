@@ -16,7 +16,44 @@
 핵심 원칙: 같은 위치의 숫자를 빼거나 같은 숫자라는 이유만으로 일치 처리하지 않는다.
 예를 들어 평균 15, 합계 15, 15%, 15명은 값이 같아도 서로 다른 수량일 수 있다.
 
-## 0. 작업 경계와 금지 사항
+## 0. 대조 전 표 정규화: CanonicalTableArtifact 생성
+
+두 표는 처음부터 같은 모양일 필요가 없다. 보고서 파싱 표의 병합 헤더·각주·패널과 코드 실행 표의 열 순서·표기·단위 표현이 다를 수 있으므로, **값과 의미를 대조하기 전에 반드시 양쪽을 같은 내부 표 형태로 정규화한다.**
+
+```text
+SourceReportTableArtifact / SourceExecutionTableArtifact (원본 구조·근거 보존)
+  → schema validation
+  → table normalizer
+  → CanonicalReportTableArtifact / CanonicalExecutionTableArtifact
+  → 표 연결 → 셀 연결 → 의미 10기준 → 수치 대조
+```
+
+정규화기는 아래를 수행한다.
+
+- 병합 헤더와 다층 열 제목을 왼쪽에서 오른쪽 순서의 `column_path[]`로 평탄화한다. 원래 헤더 셀과 범위, 순서는 `normalization_evidence`에 보존한다.
+- 패널·행 라벨·열 라벨을 분리하여 `coordinate(panel, row_key, column_path)`를 만든다. 행·열 순서가 달라도 canonical coordinate가 같을 때만 후보로 연결한다.
+- 숫자와 표시 단위를 분리하고 locale 표기·천 단위 구분자·명시적 결측 기호를 정규화한다. `-`, `N/A`, `…`, 빈 셀은 0으로 바꾸지 않고 `unknown` 또는 결측 상태로 남긴다.
+- `TOTAL`, `SUBTOTAL`, `DETAIL`, `UNKNOWN` 구조 역할을 제목·행 레이블·병합 범위·근거로 추출한다. 근거 없는 역할 추론은 `UNKNOWN`으로 남긴다.
+- 대소문자·공백 정리 외의 동의어, 행·열명 변경, 약어·지역명 변환은 승인된 매핑 레지스트리만 사용한다. 승인되지 않은 유사 표현은 자동 동일시하지 않고 후보·원문·탈락 사유를 보존한다.
+- `%`와 ratio, `cm`와 `m`처럼 차원이 호환되는 단위는 승인된 변환식과 원문 단위가 있을 때만 canonical unit으로 기록한다. 변환은 최종 수치 판정을 미리 내리지 않는다.
+- 정규화는 표의 모양을 통일하는 단계일 뿐, 의미 10기준의 `exact` 판정이나 `match` 판정을 만들지 않는다. 의미 근거가 없으면 `unknown`으로 보존한다.
+
+`CanonicalTableArtifact`의 셀은 최소 아래 필드를 가진다.
+
+```text
+CanonicalCell
+  coordinate(panel, row_key, column_path[])
+  value, raw_value, canonical_unit, missing_state, structural_role
+  semantics, source_locator, code_locator?, output_locator?
+  normalization_evidence[]
+  mapping_registry(version, hash, mapping_ids[])
+  normalization_profile(policy_id, version, input_hash)
+```
+
+- 두 artifact가 schema validation 또는 canonicalization에 실패하면 비교를 계속하지 않는다. 영향 셀은 `evidence_incomplete`와 `ARTIFACT_NORMALIZATION_FAILED` 또는 구체적 reason code로 반환하고, 처리 가능한 다른 표·셀 결과는 보존한다.
+- 정규화 프로필·매핑 레지스트리·입력 artifact 해시는 실행마다 결과에 기록한다. 같은 입력과 같은 정책이면 같은 canonical coordinate가 재현돼야 한다.
+
+## 1. 작업 경계와 금지 사항
 
 - 수정 범위는 `code_runner/`만이다. `doc_parser/`, `app/`, `main` 및 다른 파트 폴더는 수정하지 않는다.
 - 문서 파싱과 웹 화면은 구현하지 않는다. 파서가 전달한 구조화된 보고서 표와 실행 어댑터가 전달한 구조화된 실행 표를 입력으로 받는다.
@@ -25,7 +62,7 @@
 - 코드 실행은 격리 환경에서만 수행하며, 네트워크·호스트 쓰기 권한·비승인 입력 접근을 허용하지 않는다. 실행 실패는 수치 `mismatch`가 아니다.
 - 모든 결과는 사람이 재검토할 수 있는 위치·근거·reason code를 남긴다. 실패·추가·누락 후보를 삭제하거나 첫 후보로 덮어쓰지 않는다.
 
-## 1. 세 입력의 역할과 선행 검증
+## 2. 세 입력의 역할과 선행 검증
 
 입력은 세 가지다.
 
@@ -35,7 +72,7 @@
 | 분석 데이터 | 실행 어댑터/manifest | 파일 해시, 경로, 핵심 스키마·행 수 |
 | 분석 코드 | 실행 어댑터 | 승인 여부, 코드 해시, 실제 입력, 격리 실행, 출력 locator |
 
-### 1-1. 삼중 대조 선행 게이트
+### 2-1. 삼중 대조 선행 게이트
 
 표의 값을 비교하기 전에 claim 또는 표 artifact에 아래 증거를 연결한다.
 
@@ -45,9 +82,9 @@
 
 `CODE_DATA_INPUT_MISMATCH`, `CODE_DATA_SCHEMA_MISMATCH`, `CODE_NOT_APPROVED`, 실행 실패, 격리 불가, 출력 누락은 근거 부족 또는 실행 계약 실패로 기록한다. 값이 우연히 같아도 자동 `match`를 부여하지 않는다.
 
-## 2. 언어 중립 입력 계약
+## 3. 언어 중립 입력 계약
 
-공통 엔진은 최소 아래 정보가 있는 artifact만 받는다.
+파싱 파트와 실행 어댑터는 원본 표 구조·원문 위치를 담은 `Source*TableArtifact`를 제공한다. `table_normalizer`를 지난 뒤, **공통 대조 엔진은 아래 최소 계약을 만족하는 canonical artifact만 받는다.** 원본 표·정규화 결과·정규화 근거는 모두 보존한다.
 
 ```text
 ReportTableArtifact
@@ -80,7 +117,7 @@ SemanticEvidence
 
 언어별 어댑터는 출력 후보와 그 근거만 만든다. 공통 엔진의 5단계 판정을 언어별로 복제하지 않는다.
 
-## 3. 두 표를 연결하는 순서
+## 4. 두 표를 연결하는 순서
 
 ### A. 표 연결
 
@@ -121,7 +158,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 
 전체·소계·상세 행은 구조 역할(`TOTAL`, `SUBTOTAL`, `DETAIL`, `UNKNOWN`)을 별도로 보관한다. `DETAIL ↔ TOTAL`, `TOTAL ↔ SUBTOTAL`처럼 역할이 명시적으로 다르면 자동 값 비교를 금지하고 `not_comparable`로 남긴다. 역할이 `UNKNOWN`이면 임의 추론하지 않고 `needs_human_review`다.
 
-## 4. 같은 셀인지 증명하는 의미 10기준
+## 5. 같은 셀인지 증명하는 의미 10기준
 
 단일하게 연결된 셀에 아래 10개를 **반드시 이 순서로** 대조한다.
 각 기준에는 `exact`, `mismatch`, `unknown`, `not_applicable` 중 하나와 양쪽 값·근거 위치·reason code를 저장한다.
@@ -148,7 +185,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 - 하나라도 `mismatch`면 숫자가 같아도 같은 수량이 아니므로 값 차이를 계산하지 않는다.
 - mismatch는 없지만 `unknown`이 하나라도 있으면 자동 값을 비교하지 않는다.
 
-## 5. 파생 수치와 후보 재탐색
+## 6. 파생 수치와 후보 재탐색
 
 직접 출력 셀과 파생 후보를 구별한다.
 
@@ -159,7 +196,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 
 후보 점수는 연결 후보 순서에만 사용한다. 최고 점수가 낮거나 1·2위 차이가 ambiguity margin 미만이면 `needs_human_review`다.
 
-## 6. 최종 5단계 판정: 절대 우선순위
+## 7. 최종 5단계 판정: 절대 우선순위
 
 최종 `decision_status`는 아래 다섯 개만 사용한다.
 
@@ -194,7 +231,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 
 명확한 기간·산식 mismatch와 실행 실패가 함께 있으면, 이미 두 수량이 다르다는 사실이 더 강하므로 `not_comparable`을 최종 상태로 두고 실행 실패를 보조 reason code로 보존한다.
 
-## 7. 수치 비교와 허용오차
+## 8. 수치 비교와 허용오차
 
 - 변환 가능한 단위만 변환하고 변환식·원단위·변환 후 단위를 기록한다.
 - 계산은 `Decimal` 등 10진 정밀도 기준으로 수행한다. locale 표기·천 단위 구분자·결측 표기는 입력 경계에서 명시적으로 정규화하고, 파싱 불가 값은 `unknown`으로 남긴다.
@@ -205,7 +242,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 - 신장·체중·비율·정수 건수 등 승인 카탈로그가 있는 지표만 공통 정책을 쓴다. 금액·종합지수에는 임의 기본값을 적용하지 않는다.
 - `absolute_difference`, `relative_difference`는 `match`/`mismatch`일 때만 채운다. 나머지 세 상태는 `null`이다.
 
-## 8. 결과 계약과 감사 기록
+## 9. 결과 계약과 감사 기록
 
 각 보고서 셀 결과에 최소 아래를 반환한다.
 
@@ -215,6 +252,10 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
   "execution_coordinate": {"panel": "전체", "row_key": "서울", "column_path": ["만족도", "평균"]},
   "table_link_evidence": ["TABLE_MAPPING:report-table-3:summary-table"],
   "cell_link_evidence": ["ROW_KEY_EXACT", "COLUMN_PATH_MAPPING:metric.satisfaction-mean.v1"],
+  "normalization_profiles": {
+    "report": {"policy_id": "table-normalization.default", "version": "v1", "input_hash": "sha256:..."},
+    "execution": {"policy_id": "table-normalization.default", "version": "v1", "input_hash": "sha256:..."}
+  },
   "mapping_registry": {"version": "v2026.01", "hash": "...", "mapping_ids": ["geo.seoul.v1"]},
   "table_link_policy": {"policy_id": "table-link.default", "version": "v1", "minimum_score": 80, "ambiguity_margin": 10},
   "structural_role_check": {"report": "DETAIL", "execution": "DETAIL", "state": "exact"},
@@ -249,7 +290,7 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 
 후보가 여러 개라면 선택 후보만 남기지 말고 `candidate_assessments`에 전체 후보, 점수 세부내역, hard-gate 결과, 선택·탈락 사유, recovery history를 보존한다. API/UI는 이 결과를 표시만 하고 판정 규칙을 재계산하지 않는다.
 
-## 9. 필수 테스트
+## 10. 필수 테스트
 
 아래는 외부 API나 실제 Docker 없이 fixture로 자동화한다.
 
@@ -272,8 +313,13 @@ normalized(panel) + normalized(row_key) + normalized(column_path[])
 17. 같은 `TOTAL`이라도 grouping key 또는 포함 행이 다르면 `not_comparable`
 18. 0 분모 상대오차, `either`/`both`, 승인되지 않은 보고서 허용오차가 정책대로 판정됨
 19. TableLinkPolicy 버전·margin이 없거나 후보 점수 차가 margin 미만이면 자동 연결되지 않음
+20. 병합 헤더와 다층 열 제목이 같은 `column_path[]`로 정규화되고 원래 헤더 근거가 보존됨
+21. 행·열 순서가 달라도 canonical coordinate가 같으면 후보 연결; 승인되지 않은 `서울`/`서울시` 표기는 자동 연결되지 않음
+22. `%`·ratio·천 단위 표기·명시적 결측 기호가 정책대로 정규화되고 결측값이 0으로 변환되지 않음
+23. 같은 `TOTAL` 표기라도 구조 역할 근거와 포함 행이 보존되며, 근거 없는 역할은 `UNKNOWN`
+24. schema validation 또는 canonicalization 실패 셀은 `evidence_incomplete`로 남고 처리 가능한 다른 셀 결과는 보존됨
 
-## 10. 완료 조건
+## 11. 완료 조건
 
 - 5개 최종 상태가 서로 배타적인 우선순위로 반환된다.
 - 모든 결과에는 reason code, 사람이 읽는 설명, 보고서·코드·출력 위치 또는 부재 사유가 있다.

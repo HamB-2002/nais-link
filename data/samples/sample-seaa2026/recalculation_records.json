@@ -1,0 +1,890 @@
+{
+  "schema_version": "nais-recalculation-records-v1",
+  "sample_id": "sample-seaa2026",
+  "records": [
+    {
+      "metric_key": "seaa.icc_log_asd",
+      "지표": "ICC log_asd",
+      "재계산값": 0.9788,
+      "unit": "ICC",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.naive_did_from_2x2_means",
+      "지표": "Naive DiD from 2x2 means",
+      "재계산값": 17.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq1_borusyak_att",
+      "지표": "RQ1 Borusyak ATT",
+      "재계산값": -6.7,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/02_main_did.R",
+        "code_line": 65,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq1_twfe_sa_att",
+      "지표": "RQ1 TWFE-SA ATT",
+      "재계산값": -6.6,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/02_main_did.R",
+        "code_line": 65,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq1_twfe_sa_cov_att",
+      "지표": "RQ1 TWFE-SA+cov ATT",
+      "재계산값": -6.6,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/02_main_did.R",
+        "code_line": 65,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq2_cyclic_dependency_att",
+      "지표": "RQ2 Cyclic Dependency ATT",
+      "재계산값": -5.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/03_disaggregated_did.R",
+        "code_line": 64,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq2_unstable_dependency_att",
+      "지표": "RQ2 Unstable Dependency ATT",
+      "재계산값": 0.5,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/03_disaggregated_did.R",
+        "code_line": 64,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq2_hub_like_dependency_att",
+      "지표": "RQ2 Hub-Like Dependency ATT",
+      "재계산값": -5.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/03_disaggregated_did.R",
+        "code_line": 64,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.rq2_god_component_att",
+      "지표": "RQ2 God Component ATT",
+      "재계산값": 0.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/03_disaggregated_did.R",
+        "code_line": 64,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.holm_adjusted_p_values",
+      "지표": "Holm-adjusted p-values",
+      "재계산값": "CD=0.0697, UD=0.4098, HL=0.0029, GC=0.8767",
+      "unit": "p-values",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.pre_trend_wald_test",
+      "지표": "Pre-trend Wald test",
+      "재계산값": 0.896,
+      "unit": "p",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/04_event_study.R",
+        "code_line": 78,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.robustness_c_s_att",
+      "지표": "Robustness C&S ATT",
+      "재계산값": 6.5,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.robustness_c_s_ipw_att",
+      "지표": "Robustness C&S IPW ATT",
+      "재계산값": 4.2,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.robustness_placebo_twfe_sa_t_3",
+      "지표": "Robustness Placebo TWFE-SA (t-3)",
+      "재계산값": -1.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.size_stratified_small_att",
+      "지표": "Size-stratified small ATT",
+      "재계산값": -6.3,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.size_stratified_large_att",
+      "지표": "Size-stratified large ATT",
+      "재계산값": -7.2,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.robustness_multi_event_att",
+      "지표": "Robustness multi-event ATT",
+      "재계산값": -6.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.c_s_dr_monthly_contributors",
+      "지표": "C&S DR (monthly_contributors)",
+      "재계산값": 12.4,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.c_s_dr_log_kloc",
+      "지표": "C&S DR (log_kloc)",
+      "재계산값": -3.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.bacon_treated_vs_untreated",
+      "지표": "Bacon Treated-vs-Untreated",
+      "재계산값": 0.802,
+      "unit": "weight",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.size_x_treatment_interaction",
+      "지표": "Size x Treatment interaction",
+      "재계산값": 0.8636,
+      "unit": "p",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/05_robustness.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_raw_smells_att",
+      "지표": "Supp raw smells ATT",
+      "재계산값": 1.1,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_raw_cd_count_att",
+      "지표": "Supp raw CD count ATT",
+      "재계산값": 3.2,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_raw_ud_count_att",
+      "지표": "Supp raw UD count ATT",
+      "재계산값": 5.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_raw_hl_count_att",
+      "지표": "Supp raw HL count ATT",
+      "재계산값": -4.7,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_raw_gc_count_att",
+      "지표": "Supp raw GC count ATT",
+      "재계산값": -0.1,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_loc_growth_att",
+      "지표": "Supp LOC growth ATT",
+      "재계산값": 12.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_cluster_bootstrap_att",
+      "지표": "Supp cluster bootstrap ATT",
+      "재계산값": -6.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_lee_upper_pessimistic",
+      "지표": "Supp Lee UPPER (pessimistic)",
+      "재계산값": -2.3,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_lee_lower_optimistic",
+      "지표": "Supp Lee LOWER (optimistic)",
+      "재계산값": -9.9,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_active_only_3_n_94",
+      "지표": "Supp active-only (≥3, N=94)",
+      "재계산값": -4.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_active_only_6_n_128",
+      "지표": "Supp active-only (≥6, N=128)",
+      "재계산값": -5.4,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.supp_smells_package_att",
+      "지표": "Supp smells/package ATT",
+      "재계산값": -3.1,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sensitivity_packages_30_att",
+      "지표": "Sensitivity packages>=30 ATT",
+      "재계산값": -5.7,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.balanced_asd_att",
+      "지표": "Balanced ASD ATT",
+      "재계산값": -4.6,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sensitivity_kloc_1_att",
+      "지표": "Sensitivity kloc>=1 ATT",
+      "재계산값": -7.6,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sensitivity_excl_contaminated_controls_n_144",
+      "지표": "Sensitivity excl. contaminated controls (N=144)",
+      "재계산값": -6.7,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sensitivity_log_asd_no_1_n_148",
+      "지표": "Sensitivity log(ASD) no +1 (N=148)",
+      "재계산값": -13.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/08_supplementary.R",
+        "code_line": 61,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.tool_claude_code_att",
+      "지표": "Tool claude_code ATT",
+      "재계산값": -5.1,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.tool_copilot_att",
+      "지표": "Tool copilot ATT",
+      "재계산값": -4.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.tool_cursor_att",
+      "지표": "Tool cursor ATT",
+      "재계산값": -13.5,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.signal_file_add_att",
+      "지표": "Signal file_add ATT",
+      "재계산값": -9.9,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.signal_commit_pattern_att",
+      "지표": "Signal commit_pattern ATT",
+      "재계산값": 4.4,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.dose_low_att",
+      "지표": "Dose low ATT",
+      "재계산값": -7.0,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.dose_medium_att",
+      "지표": "Dose medium ATT",
+      "재계산값": -4.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.dose_high_att",
+      "지표": "Dose high ATT",
+      "재계산값": -8.3,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/09_tool_heterogeneity.R",
+        "code_line": 100,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.secondary_ce_mean_att",
+      "지표": "Secondary ce_mean ATT",
+      "재계산값": 2.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/11_secondary_metrics.R",
+        "code_line": 70,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.secondary_instability_mean_att",
+      "지표": "Secondary instability_mean ATT",
+      "재계산값": 0.4,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/11_secondary_metrics.R",
+        "code_line": 70,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.secondary_distance_mean_att",
+      "지표": "Secondary distance_mean ATT",
+      "재계산값": -0.6,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/11_secondary_metrics.R",
+        "code_line": 70,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.secondary_ca_mean_att",
+      "지표": "Secondary ca_mean ATT",
+      "재계산값": 2.8,
+      "unit": "%",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/11_secondary_metrics.R",
+        "code_line": 70,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sample_observations",
+      "지표": "분석 관측치",
+      "재계산값": 1811,
+      "unit": "observations",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/01_descriptive_stats.R",
+        "code_line": 17,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    },
+    {
+      "metric_key": "seaa.sample_repositories",
+      "지표": "분석 저장소",
+      "재계산값": 151,
+      "unit": "repositories",
+      "recompute_status": "recomputed",
+      "execution_status": "completed",
+      "provenance": {
+        "code_file": "src/analysis/01_descriptive_stats.R",
+        "code_line": 17,
+        "data_files": [
+          "data/processed/panel_monthly.csv"
+        ],
+        "data_sha256": "514f4e56847faac669f6276ba694657162a6074229877096cd481f05dcc2efae",
+        "output_file": "results/logs/analysis_summary.txt"
+      }
+    }
+  ]
+}

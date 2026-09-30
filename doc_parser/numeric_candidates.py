@@ -8,7 +8,7 @@ this stage; a later pipeline stage decides what is worth verification.
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 
@@ -94,18 +94,25 @@ def _superscript_to_int(exponent_text: str) -> int:
     return int(exponent_text.translate(translation))
 
 
-def extract_numeric_candidates(node: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """Return every numeric-looking candidate found in one common document node.
+def _extract_from_text(
+    node: Mapping[str, Any],
+    text: str,
+    *,
+    context: str | None = None,
+    row: int | None = None,
+    column: int | None = None,
+) -> list[dict[str, Any]]:
+    """Extract candidates from one text source while retaining node metadata.
 
-    Required parser fields are normally ``text``, ``page``, ``type``, and
-    ``order``.  Missing metadata is passed through as ``None`` so a malformed
-    node cannot stop extraction of other nodes.
+    For table cells, ``text`` is the source whose character offsets are
+    recorded, while ``context`` may be the whole row so later stages retain the
+    label associated with the numeric cell.
     """
 
-    text = node.get("text")
-    if not isinstance(text, str) or not text:
+    if not text:
         return []
 
+    candidate_context = text if context is None else context
     candidates: list[dict[str, Any]] = []
     for match in _CANDIDATE_RE.finditer(text):
         extra: dict[str, Any] = {}
@@ -167,14 +174,76 @@ def extract_numeric_candidates(node: Mapping[str, Any]) -> list[dict[str, Any]]:
             "raw": raw,
             "value": value,
             "unit": unit,
-            "context": text,
+            "context": candidate_context,
             "page": node.get("page"),
             "type": node.get("type"),
             "order": node.get("order"),
             "start": match.start(),
             "end": match.end(),
         }
+        if row is not None:
+            candidate["row"] = row
+        if column is not None:
+            candidate["column"] = column
         candidate.update(extra)
         candidates.append(candidate)
 
+    return candidates
+
+
+def extract_numeric_candidates(node: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Return numeric candidates found in one parser-normalized block.
+
+    Paragraphs and captions are read from ``text``.  A table with ``rows`` set
+    (including an empty list) is read only cell-by-cell; its rendered ``text``
+    is deliberately ignored to avoid duplicate candidates.  A table whose
+    ``rows`` is ``None`` falls back to ``text``.
+
+    Required parser fields are normally ``text``, ``page``, ``type``, and
+    ``order``.  Missing metadata is passed through as ``None`` so a malformed
+    node cannot stop extraction of other nodes.
+    """
+
+    if node.get("type") == "table" and node.get("rows") is not None:
+        rows = node.get("rows")
+        if not isinstance(rows, list):
+            return []
+
+        candidates: list[dict[str, Any]] = []
+        for row_index, cells in enumerate(rows):
+            if not isinstance(cells, list):
+                continue
+            row_context = " | ".join(cell if isinstance(cell, str) else "" for cell in cells)
+            for column_index, cell in enumerate(cells):
+                if not isinstance(cell, str):
+                    continue
+                candidates.extend(
+                    _extract_from_text(
+                        node,
+                        cell,
+                        context=row_context,
+                        row=row_index,
+                        column=column_index,
+                    )
+                )
+        return candidates
+
+    text = node.get("text")
+    if not isinstance(text, str):
+        return []
+    return _extract_from_text(node, text)
+
+
+def extract_numeric_candidates_from_blocks(
+    blocks: Iterable[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Extract candidates from parser-provided ``list[CollectorBlock]`` input.
+
+    This intentionally accepts only an iterable of blocks, not a Document
+    object.  Document-to-block conversion belongs to the parser adapter.
+    """
+
+    candidates: list[dict[str, Any]] = []
+    for block in blocks:
+        candidates.extend(extract_numeric_candidates(block))
     return candidates
